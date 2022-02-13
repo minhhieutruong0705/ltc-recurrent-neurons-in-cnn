@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
-from models.crnet import CRNet
-from models.ncp_fc import NCP_FC
+from crnet import CRNet
+from ncp_fc import NCP_FC
 
 """ 
 CRNetNCP_YRNN considers a 3D tensor as a sequence of data changing by y-axis, 
