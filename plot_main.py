@@ -132,4 +132,4 @@ def process_log(log_file, save_dir, is_track_early_stop=False):
 if __name__ == '__main__':
     log_file = "../covid_ncp_checkpoints/covid_log.txt"
     save_dir = "../covid_ncp_checkpoints/stats"
-    process_log(log_file, save_dir=save_dir, is_track_early_stop=False)
+    process_log(log_file, save_dir=save_dir, is_track_early_stop=True)

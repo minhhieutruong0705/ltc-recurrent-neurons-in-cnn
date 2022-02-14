@@ -20,6 +20,10 @@ if __name__ == '__main__':
     checkpoint_name = "covid_ncp_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
 
+    # create folders
+    os.makedirs(checkpoints_dir, exist_ok=True)
+    os.makedirs(os.path.join(checkpoints_dir, "stats"), exist_ok=True)
+
     # image params
     img_dim = 256
     img_crop_dim = 224
@@ -35,7 +39,7 @@ if __name__ == '__main__':
 
     # train params
     epochs = 360
-    batch_size = 32
+    batch_size = 64
     learning_rate = 1e-4
     scheduler_period = 10
 
