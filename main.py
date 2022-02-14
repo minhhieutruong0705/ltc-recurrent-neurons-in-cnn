@@ -24,6 +24,7 @@ if __name__ == '__main__':
     # image params
     img_dim = 256
     img_crop_dim = 224
+    lung_mask_incor = False
 
     # augmentation params
     random_crop_scale = 0.8
@@ -39,6 +40,9 @@ if __name__ == '__main__':
     batch_size = 64
     learning_rate = 1e-4
     scheduler_period = 10
+    in_channels = 3
+    if lung_mask_incor:
+        in_channels = 4
 
     # loss params
     bce_reduction = 'mean'
@@ -81,11 +85,12 @@ if __name__ == '__main__':
         batch_size=batch_size,
         train_transformer=train_transformer,
         val_transformer=val_transformer,
+        lung_mask_incor=lung_mask_incor
     )
 
     # init
-    model = CRNet().cuda()
-    # model = CRNetNCP_YRNN().cuda()
+    model = CRNet(in_channels=in_channels).cuda()
+    # model = CRNetNCP_YRNN(in_channels=in_channels).cuda()
     model.apply(init_weights)
     loss_function = BCEDiceLossWithLogistic(reduction=bce_reduction).cuda()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)

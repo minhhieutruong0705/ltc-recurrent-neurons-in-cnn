@@ -12,7 +12,7 @@ def get_data_loaders(
         list_train_covid, list_train_non_covid, train_transformer,
         list_val_covid, list_val_non_covid, val_transformer,
         list_test_covid, list_test_non_covid,
-        batch_size
+        batch_size, lung_mask_incor
 ):
     print("[INFO] Loading train dataset ...")
     train_dataset = CovidDataset(
@@ -20,7 +20,8 @@ def get_data_loaders(
         non_covid_dir=non_covid_dir,
         list_covid=list_train_covid,
         list_non_covid=list_train_non_covid,
-        transform=train_transformer
+        transform=train_transformer,
+        lung_mask_incor=lung_mask_incor
     )
 
     print("[INFO] Loading validation dataset ...")
@@ -29,7 +30,8 @@ def get_data_loaders(
         non_covid_dir=non_covid_dir,
         list_covid=list_val_covid,
         list_non_covid=list_val_non_covid,
-        transform=val_transformer
+        transform=val_transformer,
+        lung_mask_incor=lung_mask_incor
     )
 
     print("[INFO] Loading test dataset ...")
@@ -38,7 +40,8 @@ def get_data_loaders(
         non_covid_dir=non_covid_dir,
         list_covid=list_test_covid,
         list_non_covid=list_test_non_covid,
-        transform=val_transformer
+        transform=val_transformer,
+        lung_mask_incor=lung_mask_incor
     )
 
     train_loader = DataLoader(
