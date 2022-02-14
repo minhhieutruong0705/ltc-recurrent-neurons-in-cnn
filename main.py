@@ -1,15 +1,12 @@
-import sys
-
 import torch
 import torch.optim as optim
 import os
 
-sys.path.append("models")
-from models.crnet import CRNet
-from models.crnet_ncp_yrnn import CRNetNCP_YRNN
-from models.bce_dice_loss import BCEDiceLossWithLogistic
-from utils.covid_trainer import CovidTrainer
-from utils.covid_validator import CovidValidator
+from models import CRNet
+from models import CRNetNCP_YRNN
+from models import BCEDiceLossWithLogistic
+from utils import CovidTrainer
+from utils import CovidValidator
 from covid_facade import get_transformers, get_data_loaders
 from train_facade import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
