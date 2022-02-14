@@ -13,8 +13,8 @@ from train_facade import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_ncp_checkpoints"
-    checkpoint_name = "covid_ncp_checkpoint.pth.tar"
+    checkpoints_dir = "../covid_crnet_checkpoints"
+    checkpoint_name = "covid_crnet_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
 
     # create folders
@@ -84,8 +84,8 @@ if __name__ == '__main__':
     )
 
     # init
-    # model = CRNet().cuda()
-    model = CRNetNCP_YRNN().cuda()
+    model = CRNet().cuda()
+    # model = CRNetNCP_YRNN().cuda()
     model.apply(init_weights)
     loss_function = BCEDiceLossWithLogistic(reduction=bce_reduction).cuda()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
