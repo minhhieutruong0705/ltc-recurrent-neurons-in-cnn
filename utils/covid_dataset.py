@@ -40,7 +40,7 @@ class CovidDataset(Dataset):
             self.labels.append(1)  # positive to COVID-19 is labeled as 1; otherwise 0
         for img_name in images_non_covid:
             self.image_paths.append(os.path.join(non_covid_dir, "Normal", img_name))
-            self.lung_mask_paths.append(os.path.join(covid_dir, "Normal_LungMask", img_name))
+            self.lung_mask_paths.append(os.path.join(non_covid_dir, "Normal_LungMask", img_name))
             self.labels.append(0)
 
         # validate the dataset
