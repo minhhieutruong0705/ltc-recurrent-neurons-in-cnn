@@ -3,6 +3,7 @@ import torch.optim as optim
 import os
 
 from models import CRNet
+from models import CRNet_3FC
 from models import CRNetNCP_YRNN
 from models import BCEDiceLossWithLogistic
 from utils import CovidTrainer
@@ -13,8 +14,8 @@ from train_facade import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_crnet_checkpoints"
-    checkpoint_name = "covid_crnet_checkpoint.pth.tar"
+    checkpoints_dir = "../covid_crnet3fc_checkpoints"
+    checkpoint_name = "covid_crnet3fc_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
 
     # create folders
@@ -26,15 +27,6 @@ if __name__ == '__main__':
     img_crop_dim = 224
     lung_mask_incor = False
 
-    # augmentation params
-    random_crop_scale = 0.8
-    rotation_limit = 15
-    blur_kernel_range = (3, 7)
-    mean_norm = [0.0, 0.0, 0.0]
-    std_norm = [1.0, 1.0, 1.0]
-    max_pixel_value = 255.0
-    contrast_factor = brightness_factor = 0.2
-
     # train params
     epochs = 360
     batch_size = 64
@@ -43,6 +35,21 @@ if __name__ == '__main__':
     in_channels = 3
     if lung_mask_incor:
         in_channels = 4
+
+    # models
+    # model = CRNet(in_channels=in_channels).cuda()
+    model = CRNet_3FC(in_channels=in_channels).cuda()
+    # model = CRNetNCP_YRNN(in_channels=in_channels).cuda()
+    print(model)
+
+    # augmentation params
+    random_crop_scale = 0.8
+    rotation_limit = 15
+    blur_kernel_range = (3, 7)
+    mean_norm = [0.0, 0.0, 0.0]
+    std_norm = [1.0, 1.0, 1.0]
+    max_pixel_value = 255.0
+    contrast_factor = brightness_factor = 0.2
 
     # loss params
     bce_reduction = 'mean'
@@ -89,8 +96,6 @@ if __name__ == '__main__':
     )
 
     # init
-    model = CRNet(in_channels=in_channels).cuda()
-    # model = CRNetNCP_YRNN(in_channels=in_channels).cuda()
     model.apply(init_weights)
     loss_function = BCEDiceLossWithLogistic(reduction=bce_reduction).cuda()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
