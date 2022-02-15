@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch.optim as optim
 import os
 
@@ -29,8 +30,8 @@ if __name__ == '__main__':
 
     # train params
     epochs = 360
-    batch_size = 64
-    learning_rate = 1e-4
+    batch_size = 20
+    learning_rate = 2.5e-4
     scheduler_period = 10
     in_channels = 3
     if lung_mask_incor:
@@ -52,7 +53,7 @@ if __name__ == '__main__':
     contrast_factor = brightness_factor = 0.2
 
     # loss params
-    bce_reduction = 'mean'
+    loss_reduction = 'mean'
 
     # device
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
@@ -97,7 +98,8 @@ if __name__ == '__main__':
 
     # init
     model.apply(init_weights)
-    loss_function = BCEDiceLossWithLogistic(reduction=bce_reduction).cuda()
+    # loss_function = BCEDiceLossWithLogistic(reduction=loss_reduction).cuda()
+    loss_function = nn.MSELoss(reduction=loss_reduction).cuda()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=scheduler_period)
     scaler = torch.cuda.amp.GradScaler()
