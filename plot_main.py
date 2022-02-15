@@ -134,6 +134,6 @@ def process_log(log_file, save_dir, is_track_early_stop=False, no_show=False):
 
 
 if __name__ == '__main__':
-    log_file = "../covid_crnet_checkpoints/covid_log.txt"
-    save_dir = "../covid_crnet_checkpoints/stats"
+    log_file = "../covid_crnet3fc_checkpoints/covid_log.txt"
+    save_dir = os.path.join(os.path.dirname(log_file), "stats")
     process_log(log_file, save_dir=save_dir, is_track_early_stop=True, no_show=False)
