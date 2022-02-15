@@ -6,29 +6,47 @@ from ncp_fc import NCP_FC
 """ 
 CRNetNCP_YRNN considers a 3D tensor as a sequence of data changing by y-axis, 
 while considering the corresponding information in x-z axes the features.
-feature_enrich_factors of 4 is borrowed from the original implemtation of 
-convolutional head in Neural circuit policies enabling auditable autonomy 
-by Mathias Lechner et. al., Oct 2020
+ncp_feature_shrink value of 4 is borrowed from the "features_per_layer" variable
+in the original implementation of convolutional head in 
+Neural circuit policies enabling auditable autonomy by Mathias Lechner et. al., Oct 2020
+
+**ncp_kwargs including (default)
+    inter_neurons=12,
+    command_neurons=6,
+    motor_neurons=1,
+    sensory_outs=6,
+    inter_outs=4,
+    recurrent_dense=6,
+    motor_ins=6
 """
 
 
 class CRNetNCP_YRNN(CRNet):
-    def __init__(self, classes=2, in_channels=3, img_dim=224, down_features=[32, 64, 128], feature_shrink_value=4):
+    def __init__(
+            self,
+            classes=2,
+            in_channels=3,
+            img_dim=224,
+            down_features=[32, 64, 128],
+            ncp_wh_dim=8,  # reduce data in x-y axes to make the sequence length of 8 (y-axis)
+            ncp_feature_shrink=4,  # reduce data in z axis to make 32 sensory nodes (x*z = 8 * 4)
+            **ncp_kwargs,
+    ):
         super().__init__(classes=classes, in_channels=in_channels,
                          img_dim=img_dim, down_features=down_features)
 
         # end global average pooling: W x H -> 8 x 8
-        last_img_dim = 8
-        self.global_avg_pool = nn.AdaptiveAvgPool2d(last_img_dim)
+        self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_wh_dim)
 
         # reduce features of z axes
-        self.feat_shrink = nn.Linear(down_features[-1], feature_shrink_value)
+        self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)
 
         # ncp_fc layer
         self.ncp_fc = NCP_FC(
-            seq_len=last_img_dim,  # changes in y axis
+            seq_len=ncp_wh_dim,  # changes in y-axis
             classes=classes,
-            sensory_neurons=last_img_dim * feature_shrink_value,  # x-z values are changing values
+            sensory_neurons=ncp_wh_dim * ncp_feature_shrink,  # x-z values are changing values
+            **ncp_kwargs,
         )
 
     def forward(self, x):
