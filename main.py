@@ -12,11 +12,10 @@ from utils import CovidValidator
 from covid_facade import get_transformers, get_data_loaders
 from train_facade import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
-
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_crnet3fc_checkpoints"
-    checkpoint_name = "covid_crnet3fc_checkpoint.pth.tar"
+    checkpoints_dir = "../covid_ncp128_checkpoints"
+    checkpoint_name = "covid_ncp128_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
 
     # create folders
@@ -30,8 +29,8 @@ if __name__ == '__main__':
 
     # train params
     epochs = 360
-    batch_size = 20
-    learning_rate = 2.5e-4
+    batch_size = 64
+    learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
     if lung_mask_incor:
@@ -39,8 +38,20 @@ if __name__ == '__main__':
 
     # models
     # model = CRNet(in_channels=in_channels).cuda()
-    model = CRNet_3FC(in_channels=in_channels).cuda()
+    # model = CRNet_3FC(in_channels=in_channels).cuda()
     # model = CRNetNCP_YRNN(in_channels=in_channels).cuda()
+    model = CRNetNCP_YRNN(  # custom version of crnet-ncp with double number of neurons
+        in_channels=in_channels,
+        ncp_wh_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
+        ncp_feature_shrink=8,  # number of information in z: 128 -> 16
+        inter_neurons=24,
+        command_neurons=12,
+        motor_neurons=2,
+        sensory_outs=12,
+        inter_outs=8,
+        recurrent_dense=12,
+        motor_ins=12
+    ).cuda()
     print(model)
 
     # augmentation params
@@ -98,8 +109,8 @@ if __name__ == '__main__':
 
     # init
     model.apply(init_weights)
-    # loss_function = BCEDiceLossWithLogistic(reduction=loss_reduction).cuda()
-    loss_function = nn.MSELoss(reduction=loss_reduction).cuda()
+    loss_function = BCEDiceLossWithLogistic(reduction=loss_reduction).cuda()
+    # loss_function = nn.MSELoss(reduction=loss_reduction).cuda()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=scheduler_period)
     scaler = torch.cuda.amp.GradScaler()
