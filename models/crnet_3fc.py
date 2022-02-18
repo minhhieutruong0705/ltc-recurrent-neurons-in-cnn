@@ -47,3 +47,4 @@ if __name__ == '__main__':
     y = model(x)
     assert y.size() == (16, 2)
     print("[ASSERTION] CRNet_3FC OK!")
+    print(model)

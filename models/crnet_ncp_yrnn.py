@@ -28,24 +28,24 @@ class CRNetNCP_YRNN(CRNet):
             in_channels=3,
             img_dim=224,
             down_features=[32, 64, 128],
-            ncp_wh_dim=8,  # reduce data in x-y axes to make the sequence length of 8 (y-axis)
+            ncp_spatial_dim=8,  # reduce data in x-y axes to make the sequence length of 8 (y-axis)
             ncp_feature_shrink=4,  # reduce data in z axis to make 32 sensory nodes (x*z = 8 * 4)
             **ncp_kwargs,
     ):
         super().__init__(classes=classes, in_channels=in_channels,
                          img_dim=img_dim, down_features=down_features)
 
-        # end global average pooling: W x H -> 8 x 8
-        self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_wh_dim)
+        # end global average pooling: W x H: 27 x 27 -> 8 x 8
+        self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_spatial_dim)
 
         # reduce features of z axes
         self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)
 
         # ncp_fc layer
         self.ncp_fc = NCP_FC(
-            seq_len=ncp_wh_dim,  # changes in y-axis
+            seq_len=ncp_spatial_dim,  # changes in y-axis
             classes=classes,
-            sensory_neurons=ncp_wh_dim * ncp_feature_shrink,  # x-z values are changing values
+            sensory_neurons=ncp_spatial_dim * ncp_feature_shrink,  # x-z values are changing values
             **ncp_kwargs,
         )
 
@@ -70,3 +70,4 @@ if __name__ == '__main__':
     y = model(x)
     assert y.size() == (16, 2)
     print("[ASSERTION] CRNetNCP_YRNN OK!")
+    print(model)

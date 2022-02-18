@@ -75,3 +75,4 @@ if __name__ == '__main__':
     y = model(x)
     assert y.size() == (8, 2)
     print("[ASSERTION] NCP_FC OK!")
+    print(model)

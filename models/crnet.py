@@ -81,3 +81,4 @@ if __name__ == "__main__":
     y = F.log_softmax(y, dim=1)
     assert y.size() == (8, 2)
     print("[ASSERTION] CRNet OK!")
+    print(model)

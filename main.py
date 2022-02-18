@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     # model = CRNetNCP_YRNN(  # custom version of crnet-ncp with double number of neurons
     #     in_channels=in_channels,
-    #     ncp_wh_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
+    #     ncp_spatial_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
     #     ncp_feature_shrink=8,  # number of information in z: 128 -> 8
     #     inter_neurons=24,
     #     command_neurons=12,
@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     model = CRNetNCP_YRNN(  # custom version of crnet-ncp with half neurons as in 3FC (13*13*128 -> 1000 -> 100 -> 2)
         in_channels=in_channels,
-        ncp_wh_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
+        ncp_spatial_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
         ncp_feature_shrink=32,  # number of information in z: 128 -> 32
         inter_neurons=48,
         command_neurons=24,
