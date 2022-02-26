@@ -1,5 +1,6 @@
 import sys
-sys.path.append("./models") # root dir contains main.py
+
+sys.path.append("./models")  # root dir contains main files
 
 from .crnet import CRNet
 from .crnet_3fc import CRNet_3FC
