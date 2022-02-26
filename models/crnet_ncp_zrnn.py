@@ -61,7 +61,7 @@ class CRNetNCP_ZRNN(CRNet):
         # Replace FC with NCP_FC
         x = self.ncp_seq_conv(x)
         x = torch.flatten(x, start_dim=2)  # (B, C, H, W) -> (B, C, -1)
-        x = self.feat_shrink(x)
+        x = self.feat_shrink(x)  # reduce features in x-y axes
         x = self.ncp_fc(x)
         return x
 

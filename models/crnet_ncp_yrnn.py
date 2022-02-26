@@ -56,9 +56,8 @@ class CRNetNCP_YRNN(CRNet):
         x = self.global_avg_pool(x)
 
         # Replace FC with NCP_FC
-        # change the tensor from (bn, feats, y, x) to (bn, y, x, feats)
-        x = x.permute(0, 2, 3, 1)
-        x = self.feat_shrink(x)
+        x = x.permute(0, 2, 3, 1)  # change the tensor from (bn, feats, y, x) to (bn, y, x, feats)
+        x = self.feat_shrink(x)  # shrink features in z-axis
         x = torch.flatten(x, start_dim=2)
         x = self.ncp_fc(x)
         return x

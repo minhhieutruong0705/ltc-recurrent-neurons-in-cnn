@@ -3,10 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import os
 
-from models import CRNet
-from models import CRNet_3FC
 from models import CRNetNCP_YRNN
-from models import CRNetNCP_ZRNN
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -15,8 +12,8 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_ncpz_checkpoints"
-    checkpoint_name = "covid_ncpz_checkpoint.pth.tar"
+    checkpoints_dir = "../covid_crnet_yncp3fc_checkpoints"
+    checkpoint_name = "covid_crnet_yncp3fc_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
 
     # create folders
@@ -28,7 +25,7 @@ if __name__ == '__main__':
     lung_mask_incor = False
 
     # train params
-    epochs = 360
+    epochs = 175
     batch_size = 64
     learning_rate = 1e-4
     scheduler_period = 10
@@ -37,38 +34,18 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-
-    # model = CRNet(in_channels=in_channels).cuda()
-    # model = CRNet_3FC(in_channels=in_channels).cuda()
-
-    # model = CRNetNCP_YRNN(in_channels=in_channels).cuda()
-    # model = CRNetNCP_YRNN(  # custom version of crnet-ncp with double number of neurons
-    #     in_channels=in_channels,
-    #     ncp_spatial_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
-    #     ncp_feature_shrink=8,  # number of information in z: 128 -> 8
-    #     inter_neurons=24,
-    #     command_neurons=12,
-    #     motor_neurons=2,
-    #     sensory_outs=12,
-    #     inter_outs=8,
-    #     recurrent_dense=12,
-    #     motor_ins=12
-    # ).cuda()
-    # model = CRNetNCP_YRNN(  # custom version of crnet-ncp with half neurons as in 3FC (13*13*128 -> 1000 -> 100 -> 2)
-    #     in_channels=in_channels,
-    #     ncp_spatial_dim=16,  # RNN sequence: 8 -> 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
-    #     ncp_feature_shrink=32,  # number of information in z: 128 -> 32
-    #     inter_neurons=48,
-    #     command_neurons=24,
-    #     motor_neurons=4,
-    #     sensory_outs=24,
-    #     inter_outs=16,
-    #     recurrent_dense=24,
-    #     motor_ins=24
-    # ).cuda()  # ncp: 32*16 -> 48 (-> 24 -> 4); classification: 16*4 -> 2
-
-    model = CRNetNCP_ZRNN(in_channels=in_channels).cuda()
-
+    model = CRNetNCP_YRNN(  # custom version of crnet-ncp with half neurons as in 3FC (13*13*128 -> 1000 -> 100 -> 2)
+        in_channels=in_channels,
+        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
+        ncp_feature_shrink=32,  # number of information in z: 128 -> 32
+        inter_neurons=48,
+        command_neurons=24,
+        motor_neurons=4,
+        sensory_outs=24,
+        inter_outs=16,
+        recurrent_dense=24,
+        motor_ins=24
+    ).cuda()  # ncp: 16*32 -> 48 (-> 24 -> 4); classification: 16*4 -> 2
     print(model)
 
     # augmentation params
