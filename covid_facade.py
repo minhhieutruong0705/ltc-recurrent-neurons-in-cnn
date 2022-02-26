@@ -3,7 +3,7 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 import cv2
 
-from utils.covid_dataset import CovidDataset
+from utils_covid.covid_dataset import CovidDataset
 
 
 # loaders put data into batches and make the batches iterable
