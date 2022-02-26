@@ -10,8 +10,8 @@ from models import CRNetNCP_ZRNN
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
-from covid_facade import get_transformers, get_data_loaders
-from train_facade import init_weights, log_to_file, save_checkpoint, load_checkpoint
+from facade_covid import get_transformers, get_data_loaders
+from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
     # record files
@@ -21,7 +21,6 @@ if __name__ == '__main__':
 
     # create folders
     os.makedirs(checkpoints_dir, exist_ok=True)
-    os.makedirs(os.path.join(checkpoints_dir, "stats"), exist_ok=True)
 
     # image params
     img_dim = 256
