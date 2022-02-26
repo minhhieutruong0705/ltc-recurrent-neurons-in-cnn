@@ -1,7 +1,9 @@
 import torch
 import torch.nn as nn
+
 from crnet import CRNet
 from ncp_fc import NCP_FC
+from utils_tensor_functional import Chunker
 
 """ 
 CRNetNCP_PRNN considers a 3D tensor as a sequence of data changing by patches, 
@@ -72,12 +74,15 @@ class CRNetNCP_PRNN(CRNet):
             kernel_size=1, padding=0, stride=1, bias=True
         )
 
+        # non-overlapping patching using chunker
+        self.chunker = Chunker(chunks_per_side=ncp_patches_per_side, horizontal_seq=True)
+
         # reduce features of a patch
-        self.patch_shrink = nn.Linear(patch_features, ncp_sensory)  # 4*4*16 -> 32
+        self.patch_shrink = nn.Linear(patch_features, ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32
 
         # ncp_fc layer
         self.ncp_fc = NCP_FC(
-            seq_len=ncp_patch_spatial ** 2,  # number of patches
+            seq_len=ncp_patches_per_side ** 2,  # number of patches
             classes=classes,
             sensory_neurons=ncp_sensory,  # x-y-z values within a patch
             **ncp_kwargs,
@@ -90,21 +95,19 @@ class CRNetNCP_PRNN(CRNet):
         x = self.global_avg_pool(x)
 
         # Replace FC with NCP_FC
-        x = self.feature_shrink_conv(x)
-
-        # patching -> flatten -> shrink patch -> ncp
-
-
-        x = torch.flatten(x, start_dim=2)  # (B, C, H, W) -> (B, C, -1)
-        x = self.patch_shrink(x)
+        x = self.feature_shrink_conv(x)  # reduce information in z-axis
+        x = self.chunker(x)  # non-overlapping patching
+        x = torch.flatten(x, start_dim=2)  # (B, P, C, H_p, W_p) -> (B, P, -1); features of a patch is C*H_p*W_p
+        if self.shrink_sensory:
+            x = self.patch_shrink(x)
         x = self.ncp_fc(x)
         return x
 
 
 if __name__ == '__main__':
-    x = torch.randn(16, 3, 224, 224)
+    x = torch.randn(8, 3, 224, 224)
     model = CRNetNCP_PRNN(classes=2, in_channels=3, img_dim=224)
     y = model(x)
-    assert y.size() == (16, 2)
-    print("[ASSERTION] CRNetNCP_ZRNN OK!")
+    assert y.size() == (8, 2)
+    print("[ASSERTION] CRNetNCP_PRNN OK!")
     print(model)

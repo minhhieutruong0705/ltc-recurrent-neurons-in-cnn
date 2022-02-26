@@ -1,35 +1,48 @@
 import cv2
 import torch
+import torch.nn as nn
 from torchvision import transforms
 
 """
-spatial_unfold provides overlapping patching of a tensor image using a sliding window
+Un-folder provides overlapping patching of a tensor image using a sliding window
 
 :argument
-tensor_img: B, C, H, W
+x (tensor_img): (B, C, H, W)
 spatial_kernel_size, stride, padding
 horizontal_seq=True indicates that the sequence of patches will follow rows and then columns
 horizontal_seq=False indicates that the sequence of patches will follow columns and then rows
 
 :return
-tensor_patches = B, P, C, H_p, W_p
+tensor_patches = (B, P, C, H_p, W_p)
 """
 
 
-def spatial_unfold(tensor_img, spatial_kernel_size, stride, horizontal_seq=True):
-    # patching the tensor
-    patches = tensor_img.unfold(
-        dimension=2, size=spatial_kernel_size, step=stride  # unfold y-axis
-    ).unfold(
-        dimension=3, size=spatial_kernel_size, step=stride  # unfold x-axis
-    )  # shape: B, C, P_h, P_w, H_p, W_p
+class Unfolder(nn.Module):
+    def __init__(self, spatial_kernel_size, stride, horizontal_seq=True):
+        super().__init__()
+        self.spatial_kernel_size = spatial_kernel_size
+        self.stride = stride
+        self.horizontal_seq = horizontal_seq
 
-    # rearrange the tensor
-    redundant_axis = 2 if horizontal_seq else 3
-    patches = torch.split(patches, split_size_or_sections=1, dim=redundant_axis)
-    patches = [patch.squeeze(dim=redundant_axis) for patch in patches]
-    patches = torch.cat(patches, dim=2)
-    return patches.permute(0, 2, 1, 3, 4)
+    def extra_repr(self):
+        return f"spatial_kernel_size={self.spatial_kernel_size}, " \
+               f"stride={self.stride}, " \
+               f"horizontal_seq={self.horizontal_seq}"
+
+    def forward(self, x):
+        # patching the tensor
+        patches = x.unfold(
+            dimension=2, size=self.spatial_kernel_size, step=self.stride  # unfold y-axis
+        ).unfold(
+            dimension=3, size=self.spatial_kernel_size, step=self.stride  # unfold x-axis
+        )  # shape: (B, C, P_h, P_w, H_p, W_p)
+
+        # rearrange the tensor
+        redundant_axis = 2 if self.horizontal_seq else 3
+        patches = torch.split(patches, split_size_or_sections=1, dim=redundant_axis)
+        patches = [patch.squeeze(dim=redundant_axis) for patch in patches]
+        patches = torch.cat(patches, dim=2)
+        return patches.permute(0, 2, 1, 3, 4)
 
 
 def __load_img_as_tensor__(img_path):
@@ -44,9 +57,11 @@ def __show_tensor_img__(tensor_img):
 if __name__ == '__main__':
     img = __load_img_as_tensor__("./astronaut.jpeg")  # 512x512 image
     img = img.unsqueeze(dim=0)  # put img in a batch of 1
-    patches = spatial_unfold(img, spatial_kernel_size=256, stride=256, horizontal_seq=True)
+    model = Unfolder(spatial_kernel_size=256, stride=256, horizontal_seq=True)
+    patches = model(img)
     assert patches.size() == (1, 4, 3, 256, 256)
-    print("[ASSERT] spatial_unfold OK!")
+    print("[ASSERT] Unfolder OK!")
+    print(model)
 
     # display patches
     patches = patches.squeeze(dim=0)  # get rid of batch
