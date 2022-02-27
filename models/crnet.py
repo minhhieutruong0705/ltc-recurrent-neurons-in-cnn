@@ -18,14 +18,14 @@ class ConvPool(nn.Module):
         )
         self.bn = nn.BatchNorm2d(num_features=out_channels)
         self.relu = nn.ReLU(inplace=True)
-        self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2)
+        self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2)
 
     def forward(self, x):
         x = self.conv(x)
         if self.batch_norm:
             x = self.bn(x)
         x = self.relu(x)
-        return self.maxpool(x)
+        return self.max_pool(x)
 
 
 class CRNet(nn.Module):
@@ -40,7 +40,7 @@ class CRNet(nn.Module):
                     in_channels=in_channels,
                     out_channels=feature,
                     batch_norm=(
-                        feature == 32
+                            feature == 32
                     ),  # batch normalization is applied to first convolutional block
                 )
             )
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     y = model(x)
     assert y.size() == (8, 32, (image_size - 1) // 2, (image_size - 1) // 2)
     print("[ASSERTION] ConvPool OK!")
-
+    print(model)
 
 if __name__ == "__main__":
     image_size = 224
