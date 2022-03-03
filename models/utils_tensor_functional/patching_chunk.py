@@ -11,6 +11,8 @@ x (tensor_img): (B, C, H, W)
 tensor_img must be a square image and is divisible by chunks_per_side
 horizontal_seq=True indicates that the sequence of patches will follow rows and then columns
 horizontal_seq=False indicates that the sequence of patches will follow columns and then rows
+zigzag=True indicate the sequence of patches will be in zigzag order 
+zigzag=False indicate the sequence of patches will be a queue of of patch rows (columns)
 
 :return
 tensor of patches = (B, P, C, H_p, W_p)
@@ -18,10 +20,11 @@ tensor of patches = (B, P, C, H_p, W_p)
 
 
 class Chunker(nn.Module):
-    def __init__(self, chunks_per_side, horizontal_seq=True):
+    def __init__(self, chunks_per_side, horizontal_seq=True, zigzag=False):
         super().__init__()
-        self.horizontal_seq = horizontal_seq
         self.chunks_per_side = chunks_per_side
+        self.horizontal_seq = horizontal_seq
+        self.zigzag = zigzag
 
     def extra_repr(self):
         return f"chunks_per_side={self.chunks_per_side}, horizontal_seq={self.horizontal_seq}"
@@ -40,6 +43,8 @@ class Chunker(nn.Module):
         chunks_1side = torch.cat(chunks_1side, dim=1)  # merge a list of chunks on 1 side into a tensor
         chunks = torch.chunk(chunks_1side, chunks=self.chunks_per_side,
                              dim=h_index if self.horizontal_seq else w_index)  # y-axis
+        if self.zigzag:
+            chunks = [chunk.flip(dims=[1]) if i % 2 == 1 else chunk for i, chunk in enumerate(chunks)]
         return torch.cat(chunks, dim=1)  # merge a list of chunks into a tensor
 
 
@@ -55,7 +60,7 @@ def __show_tensor_img__(tensor_img):
 if __name__ == '__main__':
     img = __load_img_as_tensor__("./astronaut.jpeg")  # 512x512 image
     img = img.unsqueeze(dim=0)  # put img in a batch of 1
-    model = Chunker(chunks_per_side=2, horizontal_seq=True)
+    model = Chunker(chunks_per_side=2, horizontal_seq=True, zigzag=True)
     chunks = model(img)
     assert chunks.size() == (1, 4, 3, 256, 256)
     print("[ASSERT] Chunker OK!")
@@ -64,7 +69,9 @@ if __name__ == '__main__':
     # display patches
     chunks = chunks.squeeze(dim=0)  # get rid of batch
     # check the sequence of patches
-    __show_tensor_img__(chunks[0])
-    __show_tensor_img__(chunks[1])
+    # __show_tensor_img__(chunks[0])
+    # __show_tensor_img__(chunks[1])
+    __show_tensor_img__(chunks[2])
+    __show_tensor_img__(chunks[3])
     # for patch in chunks:
     #     __show_tensor_img__(patch)
