@@ -37,6 +37,8 @@ class CRNetNCP_PRNN(CRNet):
             ncp_patches_per_side=4,  # last tensor is divided into 4*4 patches to make data sequence of 16
             ncp_patch_spatial=4,  # each patch is a 4x4 (pixels) sub-tensor
             ncp_features_shrink=16,  # reduce data in z axis
+            seq_horizontal=True,  # patches in sequence of rows or columns
+            seq_zigzag=False,  # stacking order or zigzag order
             ncp_sensory=32,  # must be smaller than ncp_patch_spatial**2*ncp_features_shrink (None to skip FC)
             **ncp_kwargs,
     ):
@@ -75,7 +77,7 @@ class CRNetNCP_PRNN(CRNet):
         )
 
         # non-overlapping patching using chunker
-        self.chunker = Chunker(chunks_per_side=ncp_patches_per_side, horizontal_seq=True)
+        self.chunker = Chunker(chunks_per_side=ncp_patches_per_side, horizontal_seq=seq_horizontal, zigzag=seq_zigzag)
 
         # reduce features of a patch
         self.patch_shrink = nn.Linear(patch_features, ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32

@@ -12,8 +12,8 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_crnet_pncp_checkpoints"
-    checkpoint_name = "covid_crnet_pncp_checkpoint.pth.tar"
+    checkpoints_dir = "../covid_crnet_pncp_horstk_checkpoints"
+    checkpoint_name = "covid_crnet_pncp_horstk_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
 
     # create folders
@@ -34,7 +34,11 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_PRNN(in_channels=in_channels).cuda()
+    model = CRNetNCP_PRNN(
+        in_channels=in_channels,
+        seq_horizontal=True,
+        seq_zigzag=False
+    ).cuda()
     print(model)
 
     # augmentation params
