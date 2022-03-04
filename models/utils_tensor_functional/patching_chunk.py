@@ -27,7 +27,7 @@ class Chunker(nn.Module):
         self.zigzag = zigzag
 
     def extra_repr(self):
-        return f"chunks_per_side={self.chunks_per_side}, horizontal_seq={self.horizontal_seq}"
+        return f"chunks_per_side={self.chunks_per_side}, horizontal_seq={self.horizontal_seq}, zigzag={self.zigzag}"
 
     def forward(self, x):
         img_h, img_w = x.shape[2: 4]

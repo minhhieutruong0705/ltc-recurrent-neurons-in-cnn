@@ -30,7 +30,8 @@ class Unfolder(nn.Module):
     def extra_repr(self):
         return f"spatial_kernel_size={self.spatial_kernel_size}, " \
                f"stride={self.stride}, " \
-               f"horizontal_seq={self.horizontal_seq}"
+               f"horizontal_seq={self.horizontal_seq}, " \
+               f"zigzag={self.zigzag}"
 
     def forward(self, x):
         # patching the tensor
