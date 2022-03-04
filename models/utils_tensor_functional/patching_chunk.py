@@ -44,7 +44,7 @@ class Chunker(nn.Module):
         chunks = torch.chunk(chunks_1side, chunks=self.chunks_per_side,
                              dim=h_index if self.horizontal_seq else w_index)  # y-axis
         if self.zigzag:
-            chunks = [chunk.flip(dims=[1]) if i % 2 == 1 else chunk for i, chunk in enumerate(chunks)]
+            chunks = [chunk.contiguous().flip(dims=[1]) if i % 2 == 1 else chunk for i, chunk in enumerate(chunks)]
         return torch.cat(chunks, dim=1)  # merge a list of chunks into a tensor
 
 

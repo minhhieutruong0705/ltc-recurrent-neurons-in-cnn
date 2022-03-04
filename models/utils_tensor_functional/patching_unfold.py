@@ -46,7 +46,7 @@ class Unfolder(nn.Module):
         patches = torch.split(patches, split_size_or_sections=1, dim=redundant_axis)
         patches = [patch.squeeze(dim=redundant_axis) for patch in patches]
         if self.zigzag:
-            patches = [patch.flip(dims=[2]) if i % 2 == 1 else patch for i, patch in enumerate(patches)]
+            patches = [patch.contiguous().flip(dims=[2]) if i % 2 == 1 else patch for i, patch in enumerate(patches)]
         patches = torch.cat(patches, dim=2)
         return patches.permute(0, 2, 1, 3, 4)
 
