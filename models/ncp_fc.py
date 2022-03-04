@@ -69,6 +69,7 @@ class NCP_FC(nn.Module):
         # forward
         ltc_cell_fwd = LTCCell(wiring=wiring, in_features=sensory_neurons)
         self.ltc_fwd_seq = RNNSequence(ltc_cell_fwd)
+        # backward
         if self.bi_directional:
             ltc_cell_bwd = LTCCell(wiring=wiring, in_features=sensory_neurons)
             self.ltc_bwd_seq = RNNSequence(ltc_cell_bwd)
@@ -81,10 +82,10 @@ class NCP_FC(nn.Module):
         # x: (B, S, C)
         x_fw = self.ltc_fwd_seq(x)
         if self.bi_directional:
-            x = x.flip(dims=[1])  # backward sequence
+            x = x.flip(dims=[1])  # backward input sequence
             x_bw = self.ltc_bwd_seq(x)
             x_bw = x_bw.flip(dims=[1])  # backward prediction for concatenation
-        x = x_fw if not self.bi_directional else torch.cat((x_fw, x_bw), dim=-1)
+        x = x_fw if not self.bi_directional else torch.cat((x_fw, x_bw), dim=-1)  # bidirectional concatenate
         x = torch.flatten(x, start_dim=1)
         return self.fc(x)
 
