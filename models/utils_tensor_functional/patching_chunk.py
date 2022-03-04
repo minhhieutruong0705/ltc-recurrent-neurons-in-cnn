@@ -68,10 +68,7 @@ if __name__ == '__main__':
 
     # display patches
     chunks = chunks.squeeze(dim=0)  # get rid of batch
-    # check the sequence of patches
-    # __show_tensor_img__(chunks[0])
-    # __show_tensor_img__(chunks[1])
-    __show_tensor_img__(chunks[2])
-    __show_tensor_img__(chunks[3])
-    # for patch in chunks:
-    #     __show_tensor_img__(patch)
+    chunks = chunks.split(split_size=1, dim=0)  # split patches
+    chunks = torch.concat(chunks, dim=3)  # stack patches horizontally
+    chunks = chunks.squeeze(dim=0)  # (P, C, H, W) -> (C, H, W)
+    __show_tensor_img__(chunks)
