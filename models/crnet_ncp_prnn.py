@@ -38,7 +38,7 @@ class CRNetNCP_PRNN(CRNet):
             ncp_patch_spatial=4,  # each patch is a 4x4 (pixels) sub-tensor
             ncp_features_shrink=16,  # reduce data in z axis
             seq_horizontal=True,  # patches in sequence of rows or columns
-            seq_zigzag=False,  # stacking order or zigzag order
+            seq_zigzag=False,  # queuing order or zigzag order
             ncp_sensory=32,  # must be smaller than ncp_patch_spatial**2*ncp_features_shrink (None to skip FC)
             **ncp_kwargs,
     ):
