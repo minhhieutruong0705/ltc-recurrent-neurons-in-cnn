@@ -34,6 +34,7 @@ class CRNetNCP_PRNN(CRNet):
             in_channels=3,
             img_dim=224,
             down_features=[32, 64, 128],
+            bi_directional=False,  # combine the prediction on the backward of input sequence
             ncp_patches_per_side=4,  # last tensor is divided into 4*4 patches to make data sequence of 16
             ncp_patch_spatial=4,  # each patch is a 4x4 (pixels) sub-tensor
             ncp_features_shrink=16,  # reduce data in z axis
@@ -83,12 +84,8 @@ class CRNetNCP_PRNN(CRNet):
         self.patch_shrink = nn.Linear(patch_features, ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32
 
         # ncp_fc layer
-        self.ncp_fc = NCP_FC(
-            seq_len=ncp_patches_per_side ** 2,  # number of patches
-            classes=classes,
-            sensory_neurons=ncp_sensory,  # x-y-z values within a patch
-            **ncp_kwargs,
-        )
+        self.ncp_fc = NCP_FC(seq_len=ncp_patches_per_side ** 2, classes=classes, bi_directional=bi_directional,
+                             sensory_neurons=ncp_sensory, **ncp_kwargs)
 
     def forward(self, x):
         # CRNet
@@ -108,7 +105,7 @@ class CRNetNCP_PRNN(CRNet):
 
 if __name__ == '__main__':
     x = torch.randn(8, 3, 224, 224)
-    model = CRNetNCP_PRNN(classes=2, in_channels=3, img_dim=224)
+    model = CRNetNCP_PRNN(classes=2, in_channels=3, img_dim=224, bi_directional=True)
     y = model(x)
     assert y.size() == (8, 2)
     print("[ASSERTION] CRNetNCP_PRNN OK!")

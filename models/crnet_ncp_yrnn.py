@@ -28,6 +28,7 @@ class CRNetNCP_YRNN(CRNet):
             in_channels=3,
             img_dim=224,
             down_features=[32, 64, 128],
+            bi_directional=False,  # combine the prediction on the backward of input sequence
             ncp_spatial_dim=8,  # reduce data in x-y axes to make the sequence length of 8 (y-axis)
             ncp_feature_shrink=4,  # reduce data in z axis to make 32 sensory nodes (x*z = 8 * 4)
             **ncp_kwargs,
@@ -42,12 +43,8 @@ class CRNetNCP_YRNN(CRNet):
         self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)
 
         # ncp_fc layer
-        self.ncp_fc = NCP_FC(
-            seq_len=ncp_spatial_dim,  # changes in y-axis
-            classes=classes,
-            sensory_neurons=ncp_spatial_dim * ncp_feature_shrink,  # x-z values are changing values
-            **ncp_kwargs,
-        )
+        self.ncp_fc = NCP_FC(seq_len=ncp_spatial_dim, classes=classes, bi_directional=bi_directional,
+                             sensory_neurons=ncp_spatial_dim * ncp_feature_shrink, **ncp_kwargs)
 
     def forward(self, x):
         # CRNet
@@ -65,7 +62,7 @@ class CRNetNCP_YRNN(CRNet):
 
 if __name__ == '__main__':
     x = torch.randn(16, 3, 224, 224)
-    model = CRNetNCP_YRNN(classes=2, in_channels=3, img_dim=224)
+    model = CRNetNCP_YRNN(classes=2, in_channels=3, img_dim=224, bi_directional=True)
     y = model(x)
     assert y.size() == (16, 2)
     print("[ASSERTION] CRNetNCP_YRNN OK!")

@@ -40,7 +40,7 @@ class NCP_FC(nn.Module):
     def __init__(self,
                  seq_len,
                  classes=2,
-                 bỉ_directional=False,
+                 bi_directional=False,
                  sensory_neurons=32,
                  inter_neurons=12,
                  command_neurons=6,
@@ -53,7 +53,7 @@ class NCP_FC(nn.Module):
         super().__init__()
 
         # init
-        self.bi_directional = bỉ_directional
+        self.bi_directional = bi_directional
 
         # ncp wiring
         wiring = kncp.wirings.NCP(
@@ -85,14 +85,14 @@ class NCP_FC(nn.Module):
             x = x.flip(dims=[1])  # backward input sequence
             x_bw = self.ltc_bwd_seq(x)
             x_bw = x_bw.flip(dims=[1])  # backward prediction for concatenation
-        x = x_fw if not self.bi_directional else torch.cat((x_fw, x_bw), dim=-1)  # bidirectional concatenate
+        x = x_fw if not self.bi_directional else torch.cat((x_fw, x_bw), dim=-1)  # bi-directional concatenate
         x = torch.flatten(x, start_dim=1)
         return self.fc(x)
 
 
 if __name__ == '__main__':
     x = torch.randn(8, 32, 64)  # (batch_size, sequence_length, features)
-    model = NCP_FC(seq_len=32, sensory_neurons=64, classes=2, bỉ_directional=True)
+    model = NCP_FC(seq_len=32, classes=2, bi_directional=True, sensory_neurons=64)
     y = model(x)
     assert y.size() == (8, 2)
     print("[ASSERTION] NCP_FC OK!")
