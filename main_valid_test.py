@@ -1,20 +1,22 @@
 import os
 
-from utils_log_file_processing import parse_log, track_training, cal_mean_std
-
+from utils_log_file_processing import parse_log, track_training, get_stats
 
 if __name__ == '__main__':
-    log_file = "../covid_b32_ncp_checkpoints/covid_log.txt"
+    checkpoint_dir = "../covid_b32_ncp_checkpoints"
     show_fig = True
     is_finish = True
 
-    # init
-    analysis_dir_name = "analysis"
-    stat_file_name = "stats.txt"
+    # get training name and log file path
+    training_name = os.path.basename(checkpoint_dir).replace('_checkpoints', '')
+    log_file = os.path.join(checkpoint_dir, f"{training_name}_log.txt")
 
-    # create save dir at the same location with log file
-    log_dir = os.path.dirname(log_file)
-    analysis_dir = os.path.join(log_dir, analysis_dir_name)
+    # init save dir and files
+    analysis_dir_name = f"{training_name}_analysis"
+    stat_file_name = f"{training_name}_stats.txt"
+
+    # create save dir in checkpoint dir
+    analysis_dir = os.path.join(checkpoint_dir, analysis_dir_name)
     os.makedirs(os.path.join(analysis_dir), exist_ok=True)
     stat_file_path = os.path.join(analysis_dir, stat_file_name)
 
@@ -22,12 +24,16 @@ if __name__ == '__main__':
     data_dict = parse_log(log_file)
 
     # check training for early stop
-    track_training(data_dict, include_test=is_finish, save_dir=analysis_dir, show_fig=show_fig)
+    track_training(
+        data_dict,
+        training_name=training_name,
+        include_test=is_finish,
+        save_dir=analysis_dir,
+        show_fig=show_fig
+    )
+
+    # calculate stats
     if is_finish:
-        cal_mean_std(  # calculate statistics
-            data_dict=data_dict,
-            metrics=["[EVAL]:Acc", "[EVAL]:F1", "[EVAL]:Dice", "[TEST]:Acc", "[TEST]:F1", "[TEST]:Dice"],
-            start_i=149,
-            end_i=-1,
-            save_file_path=stat_file_path
-        )
+        get_stats(data_dict=data_dict,
+                  metrics=["[EVAL]:Acc", "[EVAL]:F1", "[EVAL]:Dice", "[TEST]:Acc", "[TEST]:F1", "[TEST]:Dice"],
+                  start_i=149, end_i=-1, save_file_path=stat_file_path)

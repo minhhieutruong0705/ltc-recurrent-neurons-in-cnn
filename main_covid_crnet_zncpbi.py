@@ -12,9 +12,10 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_crnet_bizncp_checkpoints"
-    checkpoint_name = "covid_crnet_bizncp_checkpoint.pth.tar"
-    train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
+    training_name = "covid_crnet-bizncp"
+    checkpoints_dir = f"../{training_name}_checkpoints"
+    checkpoint_name = f"{training_name}_checkpoint.pth.tar"
+    train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
 
     # create folders
     os.makedirs(checkpoints_dir, exist_ok=True)

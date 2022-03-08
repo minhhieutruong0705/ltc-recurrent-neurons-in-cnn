@@ -12,9 +12,10 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_crnet_yncp_checkpoints"
-    checkpoint_name = "covid_crnet_yncp_checkpoint.pth.tar"
-    train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
+    training_name = "covid_crnet-yncp"
+    checkpoints_dir = f"../{training_name}_checkpoints"
+    checkpoint_name = f"{training_name}_checkpoint.pth.tar"
+    train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
 
     # create folders
     os.makedirs(checkpoints_dir, exist_ok=True)
@@ -25,6 +26,7 @@ if __name__ == '__main__':
     lung_mask_incor = False
 
     # train params
+    bi_directional=False
     epochs = 175
     batch_size = 64
     learning_rate = 1e-4
@@ -34,7 +36,10 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_YRNN(in_channels=in_channels).cuda()
+    model = CRNetNCP_YRNN(
+        in_channels=in_channels,
+        bi_directional=bi_directional
+    ).cuda()
     print(model)
 
     # augmentation params

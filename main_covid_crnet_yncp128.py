@@ -12,9 +12,10 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    checkpoints_dir = "../covid_crnet_yncp128_checkpoints"
-    checkpoint_name = "covid_crnet_yncp128_checkpoint.pth.tar"
-    train_log_file = os.path.join(checkpoints_dir, "covid_log.txt")
+    training_name = "covid_crnet-yncp128"
+    checkpoints_dir = f"../{training_name}_checkpoints"
+    checkpoint_name = f"{training_name}_checkpoint.pth.tar"
+    train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
 
     # create folders
     os.makedirs(checkpoints_dir, exist_ok=True)
@@ -25,6 +26,7 @@ if __name__ == '__main__':
     lung_mask_incor = False
 
     # train params
+    bi_directional=False
     epochs = 175
     batch_size = 64
     learning_rate = 1e-4
@@ -44,7 +46,8 @@ if __name__ == '__main__':
         sensory_outs=12,
         inter_outs=8,
         recurrent_dense=12,
-        motor_ins=12
+        motor_ins=12,
+        bi_directional=bi_directional
     ).cuda()  # ncp: 16*8 -> 24 (-> 12 -> 12); classification: 16*2 -> 2
     print(model)
 
