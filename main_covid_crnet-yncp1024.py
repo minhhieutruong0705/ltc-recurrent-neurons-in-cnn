@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # train params
     bi_directional = False
     epochs = 250
-    batch_size = 64
+    batch_size = 32
     learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     # models
     model = CRNetNCP_YRNN(  # custom version of crnet-yncp (sensory neurons: 16*64)
         in_channels=in_channels,
-        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
+        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (H x W): (27 x 27) -> (16 x 16)
         ncp_feature_shrink=64,  # number of information in z: 128 -> 64
         inter_neurons=192,
         command_neurons=48,

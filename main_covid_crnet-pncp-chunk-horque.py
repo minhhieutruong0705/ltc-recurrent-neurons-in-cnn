@@ -30,7 +30,7 @@ if __name__ == '__main__':
     # train params
     bi_directional = False
     epochs = 250
-    batch_size = 64
+    batch_size = 32
     learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
@@ -38,12 +38,8 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_ChunkPRNN(
-        in_channels=in_channels,
-        seq_horizontal=True,
-        seq_zigzag=False,
-        bi_directional=bi_directional
-    ).cuda()
+    model = CRNetNCP_ChunkPRNN(in_channels=in_channels, bi_directional=bi_directional, seq_horizontal=True,
+                               seq_zigzag=False).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,

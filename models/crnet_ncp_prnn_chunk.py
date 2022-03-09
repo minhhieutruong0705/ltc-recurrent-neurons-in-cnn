@@ -41,7 +41,7 @@ class CRNetNCP_ChunkPRNN(CRNet):
             ncp_features_shrink=16,  # reduce data in z axis
             seq_horizontal=True,  # patches in sequence of rows or columns
             seq_zigzag=False,  # queuing order or zigzag order
-            ncp_sensory=32,  # must be smaller than ncp_patch_spatial**2*ncp_features_shrink (None to skip FC)
+            force_ncp_sensory=32,  # must be smaller than ncp_patch_spatial**2*ncp_features_shrink (None to skip FC)
             **ncp_kwargs,
     ):
         super().__init__(classes=classes, in_channels=in_channels,
@@ -62,11 +62,11 @@ class CRNetNCP_ChunkPRNN(CRNet):
         patch_features = ncp_patch_spatial ** 2 * ncp_features_shrink
 
         # check validity of ncp_sensory
-        if ncp_sensory is not None:
-            assert ncp_sensory < patch_features
+        if force_ncp_sensory is not None:
+            assert force_ncp_sensory < patch_features
             self.shrink_sensory = True
         else:
-            ncp_sensory = patch_features
+            force_ncp_sensory = patch_features
             self.shrink_sensory = False
 
         # end global average pooling: W x H: 27 x 27 -> 4*4 x 4*4
@@ -82,12 +82,12 @@ class CRNetNCP_ChunkPRNN(CRNet):
         self.chunker = Chunker(chunks_per_side=ncp_patches_per_side, horizontal_seq=seq_horizontal, zigzag=seq_zigzag)
 
         # reduce features of a patch
-        self.patch_shrink = nn.Linear(patch_features, ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32
+        self.patch_shrink = nn.Linear(patch_features, force_ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32
 
         # ncp_fc classifier layer
         del self.classifier
         self.ncp_fc = NCP_FC(seq_len=ncp_patches_per_side ** 2, classes=classes, bi_directional=bi_directional,
-                             sensory_neurons=ncp_sensory, **ncp_kwargs)
+                             sensory_neurons=force_ncp_sensory, **ncp_kwargs)
 
     def forward(self, x):
         # CRNet

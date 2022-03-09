@@ -41,6 +41,10 @@ class CRNetNCP_YRNN(CRNet):
         self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_spatial_dim)
 
         # reduce features of z axes
+        # Note: This linear operation could be more efficiently replaced by a convolutional operation
+        # However, this operation is more appropriate to shrink the z-channels within the concept of using
+        # y-axis as the data sequence. A convolutional operation with a spatial kernel (on x-y space) could
+        # make the information between sequence instants mixed.
         self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)
 
         # ncp_fc classifier layer

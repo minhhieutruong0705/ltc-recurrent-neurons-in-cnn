@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNetNCP_ZRNN
+from models import CRNetNCP_YRNN
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -13,7 +13,7 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    training_name = "covid_crnet-bizncp"
+    training_name = "covid_crnet-yncp1664"
     checkpoints_dir = f"../{training_name}_checkpoints"
     checkpoint_name = f"{training_name}_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     lung_mask_incor = False
 
     # train params
-    bi_directional = True
+    bi_directional = False
     epochs = 250
     batch_size = 32
     learning_rate = 1e-4
@@ -38,10 +38,19 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_ZRNN(
+    model = CRNetNCP_YRNN(  # custom version of crnet-yncp having default neck dimension: C x H x W: 128 x 13 x 13
         in_channels=in_channels,
+        ncp_spatial_dim=13,  # RNN sequence: 13; last global average pooling (H x W): (27 x 27) -> (13 x 13)
+        ncp_feature_shrink=128,  # number of information in z: 128 -> 128
+        inter_neurons=312,
+        command_neurons=78,
+        motor_neurons=7,
+        sensory_outs=156,
+        inter_outs=52,
+        recurrent_dense=78,
+        motor_ins=78,
         bi_directional=bi_directional
-    ).cuda()
+    ).cuda()  # ncp: 13*128 -> 312 -> 78 -> 7; classification: 16*7 -> 2
     print(model)
     model_summary = torchinfo.summary(
         model=model,

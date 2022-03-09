@@ -44,6 +44,8 @@ class CRNetNCP_ZRNN(CRNet):
         )
 
         # reduce features of x-y axes (x = y i.e. square image)
+        # Note: This linear operation could be replaced by an adaptive pooling operation
+        # However, this operation is better as it has trainable parameters
         self.feat_shrink = nn.Linear(self.head_img_dim ** 2, ncp_spatial_shrink)  # 13*13 -> 32
 
         # ncp_fc classifier layer
