@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from crnet import CRNet
+import torchinfo
 
 """ 
 CRNet_3FC customs the original CRNet with a more complex classification layer.
@@ -34,7 +35,7 @@ class CRNet_3FC(CRNet):
         )
 
     def forward(self, x):
-        for down in self.downsamples:
+        for down in self.down_samples:
             x = down(x)
         x = self.global_avg_pool(x)
         x = torch.flatten(x, 1)
@@ -48,3 +49,4 @@ if __name__ == '__main__':
     assert y.size() == (16, 2)
     print("[ASSERTION] CRNet_3FC OK!")
     print(model)
+    torchinfo.summary(model=model, input_data=x, device="cpu")

@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from crnet import CRNet
 from ncp_fc import NCP_FC
+import torchinfo
 
 """ 
 CRNetNCP_YRNN considers a 3D tensor as a sequence of data changing by y-axis, 
@@ -42,13 +43,14 @@ class CRNetNCP_YRNN(CRNet):
         # reduce features of z axes
         self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)
 
-        # ncp_fc layer
+        # ncp_fc classifier layer
+        del self.classifier
         self.ncp_fc = NCP_FC(seq_len=ncp_spatial_dim, classes=classes, bi_directional=bi_directional,
                              sensory_neurons=ncp_spatial_dim * ncp_feature_shrink, **ncp_kwargs)
 
     def forward(self, x):
         # CRNet
-        for down in self.downsamples:
+        for down in self.down_samples:
             x = down(x)
         x = self.global_avg_pool(x)
 
@@ -67,3 +69,4 @@ if __name__ == '__main__':
     assert y.size() == (16, 2)
     print("[ASSERTION] CRNetNCP_YRNN OK!")
     print(model)
+    torchinfo.summary(model=model, input_data=x, device="cpu")

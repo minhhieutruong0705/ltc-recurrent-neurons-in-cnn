@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torchinfo
 
 from crnet import CRNet
 from ncp_fc import NCP_FC
@@ -83,13 +84,14 @@ class CRNetNCP_PRNN(CRNet):
         # reduce features of a patch
         self.patch_shrink = nn.Linear(patch_features, ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32
 
-        # ncp_fc layer
+        # ncp_fc classifier layer
+        del self.classifier
         self.ncp_fc = NCP_FC(seq_len=ncp_patches_per_side ** 2, classes=classes, bi_directional=bi_directional,
                              sensory_neurons=ncp_sensory, **ncp_kwargs)
 
     def forward(self, x):
         # CRNet
-        for down in self.downsamples:
+        for down in self.down_samples:
             x = down(x)
         x = self.global_avg_pool(x)
 
@@ -110,3 +112,4 @@ if __name__ == '__main__':
     assert y.size() == (8, 2)
     print("[ASSERTION] CRNetNCP_PRNN OK!")
     print(model)
+    torchinfo.summary(model=model, input_data=x, device="cpu")

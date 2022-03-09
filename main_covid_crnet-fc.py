@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import torchinfo
 import os
 
 from models import CRNet
@@ -16,6 +17,7 @@ if __name__ == '__main__':
     checkpoints_dir = f"../{training_name}_checkpoints"
     checkpoint_name = f"{training_name}_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
+    model_summary_file = os.path.join(checkpoints_dir, f"{training_name}_model-summary.txt")
 
     # create folders
     os.makedirs(checkpoints_dir, exist_ok=True)
@@ -37,6 +39,16 @@ if __name__ == '__main__':
     # models
     model = CRNet(in_channels=in_channels).cuda()
     print(model)
+    model_summary = torchinfo.summary(
+        model=model,
+        input_size=(batch_size, in_channels, img_crop_dim, img_crop_dim)
+    )
+
+    # write model specification to a file
+    with open(model_summary_file, 'w') as f:
+        f.write(str(model))
+        f.write('\n\n')
+        f.write(str(model_summary))
 
     # augmentation params
     random_crop_scale = 0.8

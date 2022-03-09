@@ -1,6 +1,7 @@
 from pyexpat import model
 import torch
 import torch.nn as nn
+import torchinfo
 import kerasncp as kncp
 from kerasncp.torch import LTCCell
 
@@ -21,8 +22,7 @@ class RNNSequence(nn.Module):
         outputs = []
         for t in range(seq_len):
             inputs = x[:, t]
-            new_output, hidden_state = self.rnn_cell.forward(
-                inputs, hidden_state)
+            new_output, hidden_state = self.rnn_cell.forward(inputs, hidden_state)
             outputs.append(new_output)
         outputs = torch.stack(outputs, dim=1)  # return entire sequence
         return outputs
@@ -53,7 +53,17 @@ class NCP_FC(nn.Module):
         super().__init__()
 
         # init
+        self.seq_len = seq_len
+        self.classes = classes
         self.bi_directional = bi_directional
+        self.sensory_neurons = sensory_neurons
+        self.inter_neurons = inter_neurons
+        self.command_neurons = command_neurons
+        self.motor_neurons = motor_neurons
+        self.sensory_outs = sensory_outs
+        self.inter_outs = inter_outs
+        self.recurrent_dense = recurrent_dense
+        self.motor_ins = motor_ins
 
         # ncp wiring
         wiring = kncp.wirings.NCP(
@@ -74,9 +84,22 @@ class NCP_FC(nn.Module):
             ltc_cell_bwd = LTCCell(wiring=wiring, in_features=sensory_neurons)
             self.ltc_bwd_seq = RNNSequence(ltc_cell_bwd)
 
-        # reduce to number of classes
+        # reduce ncp sequential outputs to number of classes
         directions = 2 if self.bi_directional else 1
         self.fc = nn.Linear(motor_neurons * seq_len * directions, classes)
+
+    def extra_repr(self):
+        return f"sensory_neurons={self.sensory_neurons}, " \
+               f"inter_neurons={self.inter_neurons}, " \
+               f"command_neurons={self.command_neurons}, " \
+               f"motor_neurons={self.motor_neurons},\n" \
+               f"sensory_outs={self.sensory_outs}, " \
+               f"inter_outs={self.inter_outs}, " \
+               f"recurrent_dense={self.recurrent_dense}, " \
+               f"motor_ins={self.motor_ins},\n" \
+               f"seq_len={self.seq_len}, " \
+               f"classes={self.classes}, " \
+               f"bi_directional={self.bi_directional}"
 
     def forward(self, x):
         # x: (B, S, C)
@@ -97,3 +120,4 @@ if __name__ == '__main__':
     assert y.size() == (8, 2)
     print("[ASSERTION] NCP_FC OK!")
     print(model)
+    torchinfo.summary(model=model, input_data=x, device="cpu")

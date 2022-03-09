@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchinfo
 
 
 class ConvPool(nn.Module):
@@ -33,9 +34,9 @@ class CRNet(nn.Module):
         super().__init__()
 
         # feature extraction
-        self.downsamples = nn.ModuleList()
+        self.down_samples = nn.ModuleList()
         for feature in down_features:
-            self.downsamples.append(
+            self.down_samples.append(
                 ConvPool(
                     in_channels=in_channels,
                     out_channels=feature,
@@ -57,7 +58,7 @@ class CRNet(nn.Module):
         self.classifier = nn.Linear(self.head_img_dim ** 2 * self.head_channels, classes)
 
     def forward(self, x):
-        for down in self.downsamples:
+        for down in self.down_samples:
             x = down(x)
         x = self.global_avg_pool(x)
         x = torch.flatten(x, 1)
@@ -82,3 +83,4 @@ if __name__ == "__main__":
     assert y.size() == (8, 2)
     print("[ASSERTION] CRNet OK!")
     print(model)
+    torchinfo.summary(model=model, input_data=x, device="cpu")
