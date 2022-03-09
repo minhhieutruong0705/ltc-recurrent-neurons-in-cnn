@@ -38,7 +38,7 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_YRNN(  # custom version of crnet-yncp with double number of neurons
+    model = CRNetNCP_YRNN(  # custom version of crnet-yncp with double number of neurons (sensory neurons: 16*8)
         in_channels=in_channels,
         ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (W x H): (27 x 27) -> (16 x 16)
         ncp_feature_shrink=8,  # number of information in z: 128 -> 8

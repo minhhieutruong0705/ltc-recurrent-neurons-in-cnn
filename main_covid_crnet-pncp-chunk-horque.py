@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNetNCP_PRNN
+from models import CRNetNCP_ChunkPRNN
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -13,7 +13,7 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    training_name = "covid_crnet-pncp-horzig"
+    training_name = "covid_crnet-pncp-chunk-horque"
     checkpoints_dir = f"../{training_name}_checkpoints"
     checkpoint_name = f"{training_name}_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
@@ -38,10 +38,10 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_PRNN(
+    model = CRNetNCP_ChunkPRNN(
         in_channels=in_channels,
         seq_horizontal=True,
-        seq_zigzag=True,
+        seq_zigzag=False,
         bi_directional=bi_directional
     ).cuda()
     print(model)

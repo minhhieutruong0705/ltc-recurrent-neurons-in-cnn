@@ -7,7 +7,7 @@ from ncp_fc import NCP_FC
 from utils_tensor_functional import Chunker
 
 """ 
-CRNetNCP_PRNN considers a 3D tensor as a sequence of data changing by patches, 
+CRNetNCP_ChunkPRNN considers a 3D tensor as a sequence of data changing by patches, 
 while considering the corresponding information in x-y-z axes within a patch the features. 
 To get the patches, a square image is divided into sub-squares using a grid. 
 Every patch must have the same dimensions of x, y, and z. The idea of
@@ -28,7 +28,7 @@ sequence length is 16, number of sensory neuron is 32.
 """
 
 
-class CRNetNCP_PRNN(CRNet):
+class CRNetNCP_ChunkPRNN(CRNet):
     def __init__(
             self,
             classes=2,
@@ -107,9 +107,9 @@ class CRNetNCP_PRNN(CRNet):
 
 if __name__ == '__main__':
     x = torch.randn(8, 3, 224, 224)
-    model = CRNetNCP_PRNN(classes=2, in_channels=3, img_dim=224, bi_directional=True)
+    model = CRNetNCP_ChunkPRNN(classes=2, in_channels=3, img_dim=224, bi_directional=True)
     y = model(x)
     assert y.size() == (8, 2)
-    print("[ASSERTION] CRNetNCP_PRNN OK!")
+    print("[ASSERTION] CRNetNCP_ChunkPRNN OK!")
     print(model)
     torchinfo.summary(model=model, input_data=x, device="cpu")
