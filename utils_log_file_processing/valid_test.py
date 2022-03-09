@@ -50,6 +50,7 @@ def get_stats(data_dict, metrics, start_i, end_i, save_file_path):
             std_err = round(std / math.sqrt(len(metric_scores)), 6)
             max_score = np.max(metric_scores)
             min_score = np.min(metric_scores)
+
             # write to file
             f.write('\n')
             f.write(f"{metric}:\n")

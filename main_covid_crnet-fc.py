@@ -26,7 +26,7 @@ if __name__ == '__main__':
     lung_mask_incor = False
 
     # train params
-    epochs = 175
+    epochs = 250
     batch_size = 64
     learning_rate = 1e-4
     scheduler_period = 10
