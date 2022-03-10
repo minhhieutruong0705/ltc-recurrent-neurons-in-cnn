@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
+import torchinfo
+
 from crnet import CRNet
 from ncp_fc import NCP_FC
-import torchinfo
+from utils_cnn import BottleneckConvAvePool
 
 """ 
 CRNetNCP_YRNN considers a 3D tensor as a sequence of data changing by y-axis, 
@@ -37,30 +39,35 @@ class CRNetNCP_YRNN(CRNet):
         super().__init__(classes=classes, in_channels=in_channels,
                          img_dim=img_dim, down_features=down_features)
 
-        # end global average pooling: W x H: 27 x 27 -> 8 x 8
-        self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_spatial_dim)
+        # remove global_avg_pool and classifier layers of CRNet
+        del self.global_avg_pool, self.classifier
 
-        # reduce features of z axes
-        # Note: This linear operation could be more efficiently replaced by a convolutional operation
-        # However, this operation is more appropriate to shrink the z-channels within the concept of using
-        # y-axis as the data sequence. A convolutional operation with a spatial kernel (on x-y space) could
-        # make the information between sequence instants mixed.
-        self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)
+        # # Note: Feature shrinking using nn.Linear could be more efficiently replaced by a convolutional operation
+        # # Implementation of BottleneckConvAvePool has it with average pooling operation
+        # self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_spatial_dim)  # reduce data in x-y axes
+        # self.feat_shrink = nn.Linear(down_features[-1], ncp_feature_shrink)  # reduce features of z axis
+
+        # conv_ave_pool_bottleneck
+        self.bottleneck = BottleneckConvAvePool(
+            out_spatial=ncp_spatial_dim,  # W x H: 27 x 27 -> 8 x 8 (reduce data in x-y axes)
+            in_channels=down_features[-1],
+            out_channels=ncp_feature_shrink  # reduce features of z axis
+        )
 
         # ncp_fc classifier layer
-        del self.classifier
         self.ncp_fc = NCP_FC(seq_len=ncp_spatial_dim, classes=classes, bi_directional=bi_directional,
                              sensory_neurons=ncp_spatial_dim * ncp_feature_shrink, **ncp_kwargs)
 
     def forward(self, x):
-        # CRNet
+        # CRNet backbone
         for down in self.down_samples:
             x = down(x)
-        x = self.global_avg_pool(x)
+
+        # bottleneck
+        x = self.bottleneck(x)
 
         # Replace FC with NCP_FC
         x = x.permute(0, 2, 3, 1)  # change the tensor from (bn, feats, y, x) to (bn, y, x, feats)
-        x = self.feat_shrink(x)  # shrink features in z-axis
         x = torch.flatten(x, start_dim=2)
         x = self.ncp_fc(x)
         return x

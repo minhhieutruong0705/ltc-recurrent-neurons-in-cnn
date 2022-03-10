@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
+import torchinfo
+
 from crnet import CRNet
 from ncp_fc import NCP_FC
-import torchinfo
+from utils_cnn import BottleneckConvAvePool
 
 """ 
 CRNetNCP_ZRNN considers a 3D tensor as a sequence of data changing by z-axis, 
@@ -30,39 +32,61 @@ class CRNetNCP_ZRNN(CRNet):
             img_dim=224,
             down_features=[32, 64, 128],
             bi_directional=False,  # combine the prediction on the backward of input sequence
-            ncp_feature=16,  # reduce data in z axes to make the sequence length of 16 (z-axis)
-            ncp_spatial_shrink=32,  # reduce data in x-y axis to make 32 sensory nodes (after flattened)
+            ncp_spatial_dim=13,  # reduce data in x-y space before flattened
+            ncp_feature_seq=16,  # reduce data in z axes to make the sequence length of 16 (z-axis)
+            force_ncp_sensory=32,  # reduce data in x-y axis to make 32 sensory nodes (after flattened, None to skip)
             **ncp_kwargs,
     ):
         super().__init__(classes=classes, in_channels=in_channels,
                          img_dim=img_dim, down_features=down_features)
 
-        # convolution to change the channels (the RNN sequence length): C: 128 -> 16
-        self.ncp_seq_conv = nn.Conv2d(
-            in_channels=down_features[-1], out_channels=ncp_feature,
-            kernel_size=1, padding=0, stride=1, bias=True
+        # remove global_avg_pool and classifier layers of CRNet
+        del self.global_avg_pool, self.classifier
+
+        layer_features = ncp_spatial_dim ** 2
+
+        # check validity of force_ncp_sensory
+        if force_ncp_sensory is not None:
+            assert force_ncp_sensory < layer_features
+            self.force_shrink_sensory = True
+        else:
+            force_ncp_sensory = layer_features
+            self.force_shrink_sensory = False
+
+        # # convolution to change the channels (the RNN sequence length): C: 128 -> 16
+        # self.ncp_seq_conv = nn.Conv2d(
+        #     in_channels=down_features[-1], out_channels=ncp_feature,
+        #     kernel_size=(1, 1), padding=0, stride=(1, 1), bias=True
+        # )
+
+        # conv_ave_pool_bottleneck
+        self.bottleneck = BottleneckConvAvePool(
+            out_spatial=ncp_spatial_dim,  # W x H: 27 x 27 -> 13 x 13
+            in_channels=down_features[-1],
+            out_channels=ncp_feature_seq  # convolution to change the channels (the RNN sequence length): C: 128 -> 16
         )
 
-        # reduce features of x-y axes (x = y i.e. square image)
+        # reduce features of x-y axes (x = y i.e. square image) if force_ncp_sensory is specified: H*W: 13*13 -> 32
         # Note: This linear operation could be replaced by an adaptive pooling operation
         # However, this operation is better as it has trainable parameters
-        self.feat_shrink = nn.Linear(self.head_img_dim ** 2, ncp_spatial_shrink)  # 13*13 -> 32
+        self.feat_shrink = nn.Linear(ncp_spatial_dim ** 2, force_ncp_sensory) if self.force_shrink_sensory else None
 
         # ncp_fc classifier layer
-        del self.classifier
-        self.ncp_fc = NCP_FC(seq_len=ncp_feature, classes=classes, bi_directional=bi_directional,
-                             sensory_neurons=ncp_spatial_shrink, **ncp_kwargs)
+        self.ncp_fc = NCP_FC(seq_len=ncp_feature_seq, classes=classes, bi_directional=bi_directional,
+                             sensory_neurons=force_ncp_sensory, **ncp_kwargs)
 
     def forward(self, x):
         # CRNet
         for down in self.down_samples:
             x = down(x)
-        x = self.global_avg_pool(x)
+
+        # bottleneck
+        x = self.bottleneck(x)
 
         # Replace FC with NCP_FC
-        x = self.ncp_seq_conv(x)
         x = torch.flatten(x, start_dim=2)  # (B, C, H, W) -> (B, C, -1)
-        x = self.feat_shrink(x)  # reduce features in x-y axes
+        if self.force_shrink_sensory:
+            x = self.feat_shrink(x)  # reduce features in x-y axes after flattened
         x = self.ncp_fc(x)
         return x
 

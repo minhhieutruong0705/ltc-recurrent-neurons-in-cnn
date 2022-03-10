@@ -4,6 +4,7 @@ import torchinfo
 
 from crnet import CRNet
 from ncp_fc import NCP_FC
+from utils_cnn import BottleneckConvAvePool
 from utils_tensor_functional import Chunker
 
 """ 
@@ -41,11 +42,14 @@ class CRNetNCP_ChunkPRNN(CRNet):
             ncp_features_shrink=16,  # reduce data in z axis
             seq_horizontal=True,  # patches in sequence of rows or columns
             seq_zigzag=False,  # queuing order or zigzag order
-            force_ncp_sensory=32,  # must be smaller than ncp_patch_spatial**2*ncp_features_shrink (None to skip FC)
+            force_ncp_sensory=32,  # must be smaller than ncp_patch_spatial**2*ncp_features_shrink (None to skip)
             **ncp_kwargs,
     ):
         super().__init__(classes=classes, in_channels=in_channels,
                          img_dim=img_dim, down_features=down_features)
+
+        # remove global_avg_pool and classifier layers of CRNet
+        del self.global_avg_pool, self.classifier
 
         # # default ncp wiring with 128 sensory neurons (ncp_patch_spatial=4 and ncp_features_shrink=8)
         # if len(ncp_kwargs.keys()) == 0:
@@ -61,31 +65,37 @@ class CRNetNCP_ChunkPRNN(CRNet):
 
         patch_features = ncp_patch_spatial ** 2 * ncp_features_shrink
 
-        # check validity of ncp_sensory
+        # check validity of force_ncp_sensory
         if force_ncp_sensory is not None:
             assert force_ncp_sensory < patch_features
-            self.shrink_sensory = True
+            self.force_shrink_sensory = True
         else:
             force_ncp_sensory = patch_features
-            self.shrink_sensory = False
+            self.force_shrink_sensory = False
 
-        # end global average pooling: W x H: 27 x 27 -> 4*4 x 4*4
-        self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_patches_per_side * ncp_patch_spatial)
+        # # end global average pooling: W x H: 27 x 27 -> 4*4 x 4*4
+        # self.global_avg_pool = nn.AdaptiveAvgPool2d(ncp_patches_per_side * ncp_patch_spatial)
 
-        # convolution to change the channels of the last tensor: C: 128 -> 16
-        self.feature_shrink_conv = nn.Conv2d(
-            in_channels=down_features[-1], out_channels=ncp_features_shrink,
-            kernel_size=1, padding=0, stride=1, bias=True
+        # # convolution to change the channels of the last tensor: C: 128 -> 16
+        # self.feature_shrink_conv = nn.Conv2d(
+        #     in_channels=down_features[-1], out_channels=ncp_features_shrink,
+        #     kernel_size=(1, 1), padding=0, stride=(1, 1), bias=True
+        # )
+
+        # conv_ave_pool_bottleneck
+        self.bottleneck = BottleneckConvAvePool(
+            out_spatial=ncp_patches_per_side * ncp_patch_spatial,  # W x H: 27 x 27 -> 4*4 x 4*4
+            in_channels=down_features[-1],
+            out_channels=ncp_features_shrink  # reduce features of z axis: C: 128 -> 16
         )
 
         # non-overlapping patching using chunker
         self.chunker = Chunker(chunks_per_side=ncp_patches_per_side, horizontal_seq=seq_horizontal, zigzag=seq_zigzag)
 
-        # reduce features of a patch
-        self.patch_shrink = nn.Linear(patch_features, force_ncp_sensory) if self.shrink_sensory else None  # 4*4*16 -> 32
+        # reduce features of a patch if force_ncp_sensory is specified: patch_features: 4*4*16 -> 32
+        self.patch_shrink = nn.Linear(patch_features, force_ncp_sensory) if self.force_shrink_sensory else None
 
         # ncp_fc classifier layer
-        del self.classifier
         self.ncp_fc = NCP_FC(seq_len=ncp_patches_per_side ** 2, classes=classes, bi_directional=bi_directional,
                              sensory_neurons=force_ncp_sensory, **ncp_kwargs)
 
@@ -93,13 +103,14 @@ class CRNetNCP_ChunkPRNN(CRNet):
         # CRNet
         for down in self.down_samples:
             x = down(x)
-        x = self.global_avg_pool(x)
+
+        # bottleneck
+        x = self.bottleneck(x)
 
         # Replace FC with NCP_FC
-        x = self.feature_shrink_conv(x)  # reduce information in z-axis
         x = self.chunker(x)  # non-overlapping patching
         x = torch.flatten(x, start_dim=2)  # (B, P, C, H_p, W_p) -> (B, P, -1); features of a patch is C*H_p*W_p
-        if self.shrink_sensory:
+        if self.force_shrink_sensory:
             x = self.patch_shrink(x)
         x = self.ncp_fc(x)
         return x

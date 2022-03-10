@@ -80,14 +80,14 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path
-    covid_dir = "../datasets/Dataset_PNG/COVID"
-    non_covid_dir = "../datasets/Dataset_PNG/NONCOVID"
-    train_covid_file = "../datasets/Dataset_PNG/covid_train.txt"
-    train_non_covid_file = "../datasets/Dataset_PNG/normal_train.txt"
-    val_covid_file = "../datasets/Dataset_PNG/covid_validation.txt"
-    val_non_covid_file = "../datasets/Dataset_PNG/normal_validation.txt"
-    test_covid_file = "../datasets/Dataset_PNG/covid_test.txt"
-    test_non_covid_file = "../datasets/Dataset_PNG/normal_test.txt"
+    covid_dir = "../../datasets/Dataset_PNG/COVID"
+    non_covid_dir = "../../datasets/Dataset_PNG/NONCOVID"
+    train_covid_file = "../../datasets/Dataset_PNG/covid_train.txt"
+    train_non_covid_file = "../../datasets/Dataset_PNG/normal_train.txt"
+    val_covid_file = "../../datasets/Dataset_PNG/covid_validation.txt"
+    val_non_covid_file = "../../datasets/Dataset_PNG/normal_validation.txt"
+    test_covid_file = "../../datasets/Dataset_PNG/covid_test.txt"
+    test_non_covid_file = "../../datasets/Dataset_PNG/normal_test.txt"
 
     # augmentation
     train_transformer, val_transformer = get_transformers(

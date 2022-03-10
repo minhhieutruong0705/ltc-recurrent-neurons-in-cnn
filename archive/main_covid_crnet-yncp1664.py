@@ -13,7 +13,7 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     # record files
-    training_name = "covid_crnet-yncp128"
+    training_name = "covid_crnet-yncp1664"
     checkpoints_dir = f"../{training_name}_checkpoints"
     checkpoint_name = f"{training_name}_checkpoint.pth.tar"
     train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
@@ -38,19 +38,19 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_YRNN(  # custom version of crnet-yncp with double number of neurons (sensory neurons: 16*8)
+    model = CRNetNCP_YRNN(  # custom version of crnet-yncp having default neck dimension: C x H x W: 128 x 13 x 13
         in_channels=in_channels,
-        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (H x W): (27 x 27) -> (16 x 16)
-        ncp_feature_shrink=8,  # number of information in z: 128 -> 8
-        inter_neurons=24,
-        command_neurons=12,
-        motor_neurons=2,
-        sensory_outs=12,
-        inter_outs=8,
-        recurrent_dense=12,
-        motor_ins=12,
+        ncp_spatial_dim=13,  # RNN sequence: 13; last global average pooling (H x W): (27 x 27) -> (13 x 13)
+        ncp_feature_shrink=128,  # number of information in z: 128 -> 128
+        inter_neurons=312,
+        command_neurons=78,
+        motor_neurons=7,
+        sensory_outs=156,
+        inter_outs=52,
+        recurrent_dense=78,
+        motor_ins=78,
         bi_directional=bi_directional
-    ).cuda()  # ncp: 16*8 -> 24 (-> 12 -> 12); classification: 16*2 -> 2
+    ).cuda()  # ncp: 13*128 -> 312 -> 78 -> 7; classification: 16*7 -> 2
     print(model)
     model_summary = torchinfo.summary(
         model=model,
@@ -80,14 +80,14 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path
-    covid_dir = "../datasets/Dataset_PNG/COVID"
-    non_covid_dir = "../datasets/Dataset_PNG/NONCOVID"
-    train_covid_file = "../datasets/Dataset_PNG/covid_train.txt"
-    train_non_covid_file = "../datasets/Dataset_PNG/normal_train.txt"
-    val_covid_file = "../datasets/Dataset_PNG/covid_validation.txt"
-    val_non_covid_file = "../datasets/Dataset_PNG/normal_validation.txt"
-    test_covid_file = "../datasets/Dataset_PNG/covid_test.txt"
-    test_non_covid_file = "../datasets/Dataset_PNG/normal_test.txt"
+    covid_dir = "../../datasets/Dataset_PNG/COVID"
+    non_covid_dir = "../../datasets/Dataset_PNG/NONCOVID"
+    train_covid_file = "../../datasets/Dataset_PNG/covid_train.txt"
+    train_non_covid_file = "../../datasets/Dataset_PNG/normal_train.txt"
+    val_covid_file = "../../datasets/Dataset_PNG/covid_validation.txt"
+    val_non_covid_file = "../../datasets/Dataset_PNG/normal_validation.txt"
+    test_covid_file = "../../datasets/Dataset_PNG/covid_test.txt"
+    test_non_covid_file = "../../datasets/Dataset_PNG/normal_test.txt"
 
     # augmentation
     train_transformer, val_transformer = get_transformers(

@@ -12,12 +12,12 @@ class ConvPool(nn.Module):
         self.conv = nn.Conv2d(
             in_channels=in_channels,
             out_channels=out_channels,
-            kernel_size=7,
-            stride=1,
+            kernel_size=(7, 7),
+            stride=(1, 1),
             padding=3,
             bias=not batch_norm,
         )
-        self.bn = nn.BatchNorm2d(num_features=out_channels)
+        self.bn = nn.BatchNorm2d(num_features=out_channels) if self.batch_norm else None
         self.relu = nn.ReLU(inplace=True)
         self.max_pool = nn.MaxPool2d(kernel_size=3, stride=2)
 
