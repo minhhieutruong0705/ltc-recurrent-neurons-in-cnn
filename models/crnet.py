@@ -49,7 +49,7 @@ class CRNet(nn.Module):
             img_dim = (img_dim - 1) // 2
 
         # end global average pooling
-        self.global_avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
+        self.bottleneck = nn.AvgPool2d(kernel_size=2, stride=2)
         img_dim = (img_dim - 1) // 2
 
         # fully connected classifier
@@ -60,7 +60,7 @@ class CRNet(nn.Module):
     def forward(self, x):
         for down in self.down_samples:
             x = down(x)
-        x = self.global_avg_pool(x)
+        x = self.bottleneck(x)
         x = torch.flatten(x, 1)
         return self.classifier(x)
 

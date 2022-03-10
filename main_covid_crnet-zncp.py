@@ -38,10 +38,7 @@ if __name__ == '__main__':
         in_channels = 4
 
     # models
-    model = CRNetNCP_ZRNN(
-        in_channels=in_channels,
-        bi_directional=bi_directional
-    ).cuda()
+    model = CRNetNCP_ZRNN(in_channels=in_channels, bi_directional=bi_directional).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
