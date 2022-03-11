@@ -8,7 +8,7 @@ def parse_log(log_file):
                  "FN": []}
     data_dict = {
         "[TRAIN]": train_data,
-        "[EVAL]": val_data,
+        "[VALID]": val_data,
         "[TEST]": test_data
     }
 
@@ -31,7 +31,7 @@ def parse_log(log_file):
                 data_dict[log_mode][metric].append(metric_value)
 
     # validate data reading
-    if len(data_dict["[TRAIN]"]) != len(data_dict["[EVAL]"]):
+    if len(data_dict["[TRAIN]"]) != len(data_dict["[VALID]"]):
         print("[ERROR] Train size and validation size mismatch!")
 
     return data_dict

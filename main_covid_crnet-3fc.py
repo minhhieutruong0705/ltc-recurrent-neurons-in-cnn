@@ -12,15 +12,8 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    # record files
     training_name = "covid_crnet-3fc"
-    checkpoints_dir = f"../{training_name}_checkpoints"
-    checkpoint_name = f"{training_name}_checkpoint.pth.tar"
-    train_log_file = os.path.join(checkpoints_dir, f"{training_name}_log.txt")
-    model_summary_file = os.path.join(checkpoints_dir, f"{training_name}_model-summary.txt")
-
-    # create folders
-    os.makedirs(checkpoints_dir, exist_ok=True)
+    shuffler_version = 1
 
     # image params
     img_dim = 256
@@ -32,9 +25,7 @@ if __name__ == '__main__':
     batch_size = 64
     learning_rate = 1e-4
     scheduler_period = 10
-    in_channels = 3
-    if lung_mask_incor:
-        in_channels = 4
+    in_channels = 3 if not lung_mask_incor else 4
 
     # models
     model = CRNet_3FC(in_channels=in_channels).cuda()  # 3FC: 13*13*128 -> 1000 -> 100 -> 2
@@ -43,6 +34,19 @@ if __name__ == '__main__':
         model=model,
         input_size=(batch_size, in_channels, img_crop_dim, img_crop_dim)
     )
+
+    # checkpoint files
+    checkpoints_dir = f"../{training_name}_{shuffler_version}_checkpoints"
+    checkpoint_name = f"{training_name}.pth.tar"
+
+    # record files
+    record_dir = f"records/covid_{shuffler_version}/{training_name}"
+    train_log_file = os.path.join(record_dir, f"{training_name}_log.txt")
+    model_summary_file = os.path.join(record_dir, f"{training_name}_model-summary.txt")
+
+    # create folders
+    os.makedirs(checkpoints_dir, exist_ok=True)
+    os.makedirs(record_dir, exist_ok=True)
 
     # write model specification to a file
     with open(model_summary_file, 'w') as f:
@@ -66,15 +70,17 @@ if __name__ == '__main__':
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     print("[INFO] Using " + device + " for training ...")
 
-    # path
-    covid_dir = "../datasets/Dataset_PNG/COVID"
-    non_covid_dir = "../datasets/Dataset_PNG/NONCOVID"
-    train_covid_file = "../datasets/Dataset_PNG/covid_train.txt"
-    train_non_covid_file = "../datasets/Dataset_PNG/normal_train.txt"
-    val_covid_file = "../datasets/Dataset_PNG/covid_validation.txt"
-    val_non_covid_file = "../datasets/Dataset_PNG/normal_validation.txt"
-    test_covid_file = "../datasets/Dataset_PNG/covid_test.txt"
-    test_non_covid_file = "../datasets/Dataset_PNG/normal_test.txt"
+    # path for images
+    covid_dir = "../datasets/Dataset_Covid/COVID"
+    non_covid_dir = "../datasets/Dataset_Covid/NONCOVID"
+
+    # path for train, validation, and test sets
+    train_covid_file = f"records/covid_{shuffler_version}/covid_train_{shuffler_version}.txt"
+    train_non_covid_file = f"records/covid_{shuffler_version}/normal_train_{shuffler_version}.txt"
+    val_covid_file = f"records/covid_{shuffler_version}/covid_val_{shuffler_version}.txt"
+    val_non_covid_file = f"records/covid_{shuffler_version}/normal_val_{shuffler_version}.txt"
+    test_covid_file = f"records/covid_{shuffler_version}/covid_test_{shuffler_version}.txt"
+    test_non_covid_file = f"records/covid_{shuffler_version}/normal_test_{shuffler_version}.txt"
 
     # augmentation
     train_transformer, val_transformer = get_transformers(
@@ -131,20 +137,33 @@ if __name__ == '__main__':
     )
 
     # train & eval
+    best_score = -1
     for i in range(epochs):
         # train
         loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_trainer.train()
         log_to_file(train_log_file, "TRAIN", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
         # eval
         loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_validator.eval()
-        log_to_file(train_log_file, "EVAL", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
-        # save checkpoint
+        log_to_file(train_log_file, "VALID", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
+        # set checkpoint
         checkpoint = {
             "epoch": i,
             "state_dict": model.state_dict(),
             "optimizer": optimizer.state_dict(),
         }
-        save_checkpoint(checkpoint, os.path.join(checkpoints_dir, checkpoint_name), checkpoint_index=i)
+        # save last checkpoint
+        save_checkpoint(
+            state=checkpoint,
+            checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_last.pth.tar"))
+        )
+        # save best checkpoint
+        score = accuracy * 0.2 + f1 * 0.3 + dice * 0.5
+        if score > best_score:
+            best_score = score
+            save_checkpoint(
+                state=checkpoint,
+                checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
+            )
 
     # tester
     covid_tester = CovidValidator(
@@ -156,13 +175,7 @@ if __name__ == '__main__':
     )
 
     # test
-    checkpoint_basename = checkpoint_name.split('.', maxsplit=1)
-    for i in range(epochs):
-        checkpoint_path = os.path.join(checkpoints_dir, f"{checkpoint_basename[0]}{i}.{checkpoint_basename[1]}")
-        load_checkpoint(
-            checkpoint=torch.load(checkpoint_path),
-            model=model,
-            optimizer=optimizer
-        )
-        loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_tester.eval()
-        log_to_file(train_log_file, "TEST", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
+    checkpoint_file = os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
+    best_epoch = load_checkpoint(checkpoint_file=checkpoint_file, model=model, optimizer=optimizer)
+    loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_tester.eval()
+    log_to_file(train_log_file, "TEST", best_epoch, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)

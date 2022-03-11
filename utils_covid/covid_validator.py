@@ -44,7 +44,7 @@ class CovidValidator():
         dice = tp / (fp + fn + tp) * 100
         avg_eval_loss = total_eval_loss / len(self.loader)
 
-        print(f"\n[{'EVAL' if not self.is_test else 'TEST'}]:           "
+        print(f"\n[{'VALID' if not self.is_test else 'TEST'}]:           "
               f"{'Validation' if not self.is_test else 'Test'} Loss: {avg_eval_loss:.6f}")
         print(f"[Classification]: Dice: {dice:2f}, Acc: {accuracy:2f}, F1: {f1:2f},")
         print(f"[Confusion]:      TP: {tp.item()}, TN: {tn.item()}, FP: {fp.item()}, FN: {fn.item()}")

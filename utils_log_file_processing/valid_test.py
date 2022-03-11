@@ -5,19 +5,25 @@ import math
 from utils_plot import plot_fig
 
 
-def track_training(data_dict, training_name, include_test=True, **plt_kwarg):
+def track_training(data_dict, training_name, **plt_kwarg):
     x = range(len(data_dict["[TRAIN]"]["Loss"]))  # number of epochs
 
-    # plot train & eval loss
-    plot_fig(fig_name=f"{training_name}_train-val_loss", x=x,
-             ys=[data_dict["[TRAIN]"]["Loss"], data_dict["[EVAL]"]["Loss"]], y_names=["train loss", "validation loss"],
-             bound_value=0, **plt_kwarg)
+    # plot train loss
+    plot_fig(fig_name=f"{training_name}_train_loss", x=x,
+             ys=[data_dict["[TRAIN]"]["Loss"]], y_names=["train loss"], bound_value=0, **plt_kwarg)
+
+    # plot validation loss
+    plot_fig(fig_name=f"{training_name}_validation_loss", x=x,
+             ys=[data_dict["[VALID]"]["Loss"]], y_names=["validation loss"], bound_value=0, **plt_kwarg)
 
     # plot train & eval accuracy & dice
-    plot_fig(fig_name=f"{training_name}_train-val_accuracy-dice", x=x,
-             ys=[data_dict["[TRAIN]"]["Acc"], data_dict["[EVAL]"]["Acc"], data_dict["[TRAIN]"]["Dice"],
-                 data_dict["[EVAL]"]["Dice"]],
-             y_names=["train accuracy", "validation accuracy", "train dice", "validation dice"], bound_value=100,
+    plot_fig(fig_name=f"{training_name}_train-val_metrics", x=x,
+             ys=[data_dict["[TRAIN]"]["Acc"], data_dict["[VALID]"]["Acc"],
+                 data_dict["[TRAIN]"]["F1"], data_dict["[VALID]"]["F1"],
+                 data_dict["[TRAIN]"]["Dice"], data_dict["[VALID]"]["Dice"]],
+             y_names=["train accuracy", "validation accuracy",
+                      "train f1", "validation f1",
+                      "train dice", "validation dice"], bound_value=100,
              **plt_kwarg)
 
     # plot train
@@ -27,14 +33,8 @@ def track_training(data_dict, training_name, include_test=True, **plt_kwarg):
 
     # plot eval
     plot_fig(fig_name=f"{training_name}_validation-metrics", x=x,
-             ys=[data_dict["[EVAL]"]["Acc"], data_dict["[EVAL]"]["F1"], data_dict["[EVAL]"]["Dice"]],
+             ys=[data_dict["[VALID]"]["Acc"], data_dict["[VALID]"]["F1"], data_dict["[VALID]"]["Dice"]],
              y_names=["validation accuracy", "validation f1", "validation dice"], bound_value=100, **plt_kwarg)
-
-    if include_test:  # after training is finished
-        # plot test
-        plot_fig(fig_name=f"{training_name}_test-metrics", x=x,
-                 ys=[data_dict["[TEST]"]["Acc"], data_dict["[TEST]"]["F1"], data_dict["[TEST]"]["Dice"]],
-                 y_names=["test accuracy", "test f1", "test dice"], bound_value=100, **plt_kwarg)
 
 
 def get_stats(data_dict, metrics, start_i, end_i, save_file_path):

@@ -38,7 +38,9 @@ def save_checkpoint(state, checkpoint_file, checkpoint_index=None):
 
 
 # load checkpoint
-def load_checkpoint(checkpoint, model, optimizer):
-    model.load_state_dict(checkpoint["state_dict"])
-    optimizer.load_state_dict(checkpoint["optimizer"])
+def load_checkpoint(checkpoint_file, model, optimizer):
+    checkpoint_state = torch.load(checkpoint_file)
+    model.load_state_dict(checkpoint_state["state_dict"])
+    optimizer.load_state_dict(checkpoint_state["optimizer"])
     print("[INFO] Checkpoint loaded")
+    return checkpoint_state["epoch"]

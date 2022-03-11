@@ -92,10 +92,10 @@ if __name__ == '__main__':
     ])
 
     covid_train_dataset = CovidDataset(
-        covid_dir="../../datasets/Dataset_PNG/COVID",
-        non_covid_dir="../../datasets/Dataset_PNG/NONCOVID",
-        list_covid="../../datasets/Dataset_PNG/covid_train.txt",
-        list_non_covid="../../datasets/Dataset_PNG/normal_train.txt",
+        covid_dir="../../datasets/Dataset_Covid/COVID",
+        non_covid_dir="../../datasets/Dataset_Covid/NONCOVID",
+        list_covid="../../datasets/Dataset_Covid/covid_train.txt",
+        list_non_covid="../../datasets/Dataset_Covid/normal_train.txt",
         transform=train_transformer,
         lung_mask_incor=True
     )

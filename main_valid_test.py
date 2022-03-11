@@ -27,7 +27,6 @@ if __name__ == '__main__':
     track_training(
         data_dict,
         training_name=training_name,
-        include_test=is_finish,
         save_dir=analysis_dir,
         show_fig=show_fig
     )
@@ -35,5 +34,5 @@ if __name__ == '__main__':
     # calculate stats
     if is_finish:
         get_stats(data_dict=data_dict,
-                  metrics=["[EVAL]:Acc", "[EVAL]:F1", "[EVAL]:Dice", "[TEST]:Acc", "[TEST]:F1", "[TEST]:Dice"],
-                  start_i=149, end_i=-1, save_file_path=stat_file_path)
+                  metrics=["[VALID]:Acc", "[VALID]:F1", "[VALID]:Dice"],
+                  start_i=150, end_i=-1, save_file_path=stat_file_path)
