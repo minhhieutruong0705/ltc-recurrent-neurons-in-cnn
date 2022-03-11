@@ -24,9 +24,9 @@ class CovidValidator():
                 label = label.to(self.device)
                 prediction = self.model(x)
 
-                prediction_no_grad = prediction.argmax(dim=1, keepdim=True).float()
-                ground_truth_no_grad = label.view_as(prediction_no_grad).float()
-                loss = self.loss_fn(prediction_no_grad, ground_truth_no_grad)
+                prediction_no_grad = prediction.argmax(dim=1, keepdim=True)
+                ground_truth_no_grad = label.view_as(prediction_no_grad)
+                loss = self.loss_fn(prediction_no_grad.float(), ground_truth_no_grad.float())
 
                 tp += (prediction_no_grad * ground_truth_no_grad).sum()
                 tn += ((1 - prediction_no_grad).abs() * (1 - ground_truth_no_grad).abs()).sum()
@@ -44,7 +44,7 @@ class CovidValidator():
         dice = tp / (fp + fn + tp) * 100
         avg_eval_loss = total_eval_loss / len(self.loader)
 
-        print(f"\n[{'VALID' if not self.is_test else 'TEST'}]:           "
+        print(f"\n[{'VALID' if not self.is_test else 'TEST'}]:          "
               f"{'Validation' if not self.is_test else 'Test'} Loss: {avg_eval_loss:.6f}")
         print(f"[Classification]: Dice: {dice:2f}, Acc: {accuracy:2f}, F1: {f1:2f},")
         print(f"[Confusion]:      TP: {tp.item()}, TN: {tn.item()}, FP: {fp.item()}, FN: {fn.item()}")

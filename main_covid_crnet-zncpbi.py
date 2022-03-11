@@ -41,8 +41,8 @@ if __name__ == '__main__':
     checkpoint_name = f"{training_name}.pth.tar"
 
     # record files
-    record_dir = f"records/covid_{shuffler_version}/{training_name}"
-    train_log_file = os.path.join(record_dir, f"{training_name}_log.txt")
+    record_dir = f"records/covid_{shuffler_version}/{training_name}_{shuffler_version}"
+    train_log_file = os.path.join(record_dir, f"{training_name}_{shuffler_version}_log.txt")
     model_summary_file = os.path.join(record_dir, f"{training_name}_model-summary.txt")
 
     # create folders
@@ -140,6 +140,7 @@ if __name__ == '__main__':
     # train & eval
     best_score = -1
     for i in range(epochs):
+        print(f"[INFO] {i + 1}/{epochs} epochs")
         # train
         loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_trainer.train()
         log_to_file(train_log_file, "TRAIN", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
@@ -161,6 +162,7 @@ if __name__ == '__main__':
         score = accuracy * 0.2 + f1 * 0.3 + dice * 0.5
         if score > best_score:
             best_score = score
+            print(f"[INFO] New best scored obtained: {best_score:.2f}")
             save_checkpoint(
                 state=checkpoint,
                 checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))

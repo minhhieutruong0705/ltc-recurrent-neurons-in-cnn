@@ -56,7 +56,7 @@ class CovidTrainer():
         dice = tp / (fp + fn + tp) * 100
         avg_train_loss = total_train_loss / len(self.loader)
 
-        print("\n[TRAIN]:         Training Loss: {:.6f}".format(avg_train_loss))
+        print("\n[TRAIN]:          Training Loss: {:.6f}".format(avg_train_loss))
         print(f"[Classification]: Dice: {dice:2f}, Acc: {accuracy:2f}, F1: {f1:2f},")
         print(f"[Confusion]:      TP: {tp.item()}, TN: {tn.item()}, FP: {fp.item()}, FN: {fn.item()}")
         return avg_train_loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn
