@@ -4,8 +4,12 @@ from utils_log_file_processing import parse_log, track_training, get_stats
 
 if __name__ == '__main__':
     shuffler_version = 1
-    record_dir = "records/covid_1/covid_crnet_1"
-    show_fig = True
+    # record_dir = "records/covid_1/covid_crnet_1"
+    # record_dir = "records/covid_1/covid_crnet-3fc_1"
+    # record_dir = "records/covid_1/covid_crnet-4fc_1"
+    # record_dir = "records/covid_1/covid_crnet-3fc32_1"
+    record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horque_1"
+    show_fig = False
 
     # get training name and log file path
     training_name = os.path.basename(record_dir)
@@ -37,3 +41,10 @@ if __name__ == '__main__':
         metrics=["[VALID]:Acc", "[VALID]:F1", "[VALID]:Dice"],
         start_i=150, end_i=-1, save_file_path=stat_file_path
     )
+
+    # get test result on best validated epochs
+    with open(log_file, 'r') as f:
+        test_result = f.readlines()[-1]  # last line in log file
+    with open(stat_file_path, 'a+') as f:
+        f.write("\nTest result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):")
+        f.write(f"\n{test_result}")
