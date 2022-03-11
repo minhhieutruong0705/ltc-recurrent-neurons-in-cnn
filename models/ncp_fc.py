@@ -86,7 +86,10 @@ class NCP_FC(nn.Module):
 
         # reduce ncp sequential outputs to number of classes
         directions = 2 if self.bi_directional else 1
-        self.fc = nn.Linear(motor_neurons * seq_len * directions, classes)
+        self.fc = nn.Sequential(
+            nn.Dropout(p=0.3),
+            nn.Linear(motor_neurons * seq_len * directions, classes)
+        )
 
     def extra_repr(self):
         return f"sensory_neurons={self.sensory_neurons}, " \
