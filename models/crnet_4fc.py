@@ -6,7 +6,7 @@ import torchinfo
 """ 
 CRNet_4FC customs the original CRNet with a more complex classification layer.
 The layer consists of 3 fully connected blocks reducing the size
-from 13*13*128 to 1024 to 100 and finally number of classes. The implementation
+from 13*13*128 to 1024 to 192 to 48 and finally number of classes. The implementation
 is borrowed from the original implementation of the "feedforward CNN" in
 Neural circuit policies enabling auditable autonomy by Mathias Lechner et. al., Oct 2020 
 """
