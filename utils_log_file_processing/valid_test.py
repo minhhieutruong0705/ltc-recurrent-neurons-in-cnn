@@ -43,11 +43,12 @@ def get_stats(data_dict, metrics, start_i, end_i, save_file_path):
             # get scores
             log_mode, metric_name = metric.split(':')  # parse input
             metric_scores = data_dict[log_mode][metric_name][start_i:end_i]
+            assert len(metric_scores) > 0
 
             # calculate mean, standard deviation, standard error, max, min
-            mean = round(np.mean(metric_scores), 6)
-            std = round(np.std(metric_scores), 6)
-            std_err = round(std / math.sqrt(len(metric_scores)), 6)
+            mean = np.mean(metric_scores)
+            std = np.std(metric_scores)
+            std_err = std / math.sqrt(len(metric_scores))
             max_score = np.max(metric_scores)
             min_score = np.min(metric_scores)
 

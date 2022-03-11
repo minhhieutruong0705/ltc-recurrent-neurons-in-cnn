@@ -32,6 +32,8 @@ if __name__ == '__main__':
     )
 
     # calculate stats
-    get_stats(data_dict=data_dict,
-              metrics=["[VALID]:Acc", "[VALID]:F1", "[VALID]:Dice"],
-              start_i=150, end_i=-1, save_file_path=stat_file_path)
+    get_stats(
+        data_dict=data_dict,
+        metrics=["[VALID]:Acc", "[VALID]:F1", "[VALID]:Dice"],
+        start_i=150, end_i=-1, save_file_path=stat_file_path
+    )
