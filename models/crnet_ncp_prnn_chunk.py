@@ -68,7 +68,11 @@ class CRNetNCP_ChunkPRNN(CRNet):
             adaptive_ncp_sensory = patch_features
         else:  # reduce features of a patch if adaptive_ncp_sensory is specified: H_p*W_p*C -> adaptive_ncp_sensory
             self.is_adaptive_shrink = True
-            self.adaptive_shrink = nn.Linear(patch_features, adaptive_ncp_sensory)
+            self.adaptive_shrink = nn.Sequential(
+                nn.Dropout(p=0.5),
+                nn.Linear(patch_features, adaptive_ncp_sensory),
+                nn.ReLU(inplace=True)
+            )
 
         # ncp_fc layer
         self.ncp_fc = NCP_FC(seq_len=ncp_patches_per_side ** 2, classes=classes, bi_directional=bi_directional,

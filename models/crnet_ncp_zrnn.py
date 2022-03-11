@@ -57,7 +57,11 @@ class CRNetNCP_ZRNN(CRNet):
             adaptive_ncp_sensory = layer_features
         else:  # reduce spatial features if adaptive_ncp_sensory is specified: H*W -> adaptive_ncp_sensory
             self.force_shrink_sensory = True
-            self.adaptive_shrink = nn.Linear(ncp_spatial_dim ** 2, adaptive_ncp_sensory)
+            self.adaptive_shrink = nn.Sequential(
+                nn.Dropout(p=0.5),
+                nn.Linear(layer_features, adaptive_ncp_sensory),
+                nn.ReLU(inplace=True)
+            )
 
         # ncp_fc layer
         self.ncp_fc = NCP_FC(seq_len=ncp_feature_seq, classes=classes, bi_directional=bi_directional,
