@@ -21,10 +21,10 @@ class CRNet_Mini3FC(CRNet):
             in_channels=3,
             img_dim=224,
             down_features=[32, 64, 128],
-            bottleneck_spatial=13,  # similar to original CRNet and CRNet_3FC
-            bottleneck_channels=128,  # similar to original CRNet and CRNet_3FC
-            fc1_channels=1000,
-            fc2_channels=100,
+            bottleneck_spatial=2,  # original CRNet and CRNet_3FC: 13
+            bottleneck_channels=8,  # original CRNet and CRNet_3FC: 128
+            fc1_channels=12,  # original CRNet and CRNet_3FC: 1000
+            fc2_channels=6,  # original CRNet and CRNet_3FC: 100
     ):
         super().__init__(classes=classes, in_channels=in_channels,
                          img_dim=img_dim, down_features=down_features)
