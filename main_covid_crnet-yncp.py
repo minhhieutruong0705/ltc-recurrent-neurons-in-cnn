@@ -143,7 +143,7 @@ if __name__ == '__main__':
     # train & eval
     best_score = -1
     for i in range(epochs):
-        print(f"[INFO] {i + 1}/{epochs} epochs")
+        print(f"\n[INFO] {i + 1}/{epochs} epochs")
         # train
         loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_trainer.train()
         log_to_file(train_log_file, "TRAIN", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
