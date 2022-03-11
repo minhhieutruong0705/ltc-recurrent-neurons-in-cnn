@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-bizncp"
+    training_name = "covid_crnet-zncp32"
     shuffler_version = 1
 
     # image params
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     in_channels = 3 if not lung_mask_incor else 4
 
     # models
-    bi_directional = True
+    bi_directional = False
     model = CRNetNCP_ZRNN(in_channels=in_channels, bi_directional=bi_directional).cuda()
     print(model)
     model_summary = torchinfo.summary(
