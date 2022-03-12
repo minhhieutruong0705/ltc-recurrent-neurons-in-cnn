@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet"
+    training_name = "covid_crnet-1fc"
     shuffler_version = 1
 
     # image params

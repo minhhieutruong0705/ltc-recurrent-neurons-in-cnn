@@ -3,8 +3,8 @@ import os
 from utils_log_file_processing import parse_log, track_training, get_stats
 
 if __name__ == '__main__':
-    # record_dir = "records/covid_1/covid_crnet_1"
-    # record_dir = "records/covid_2/covid_crnet_2"
+    # record_dir = "records/covid_1/covid_crnet-1fc_1"
+    # record_dir = "records/covid_2/covid_crnet-1fc_2"
 
     # record_dir = "records/covid_1/covid_crnet-3fc_1"
 
