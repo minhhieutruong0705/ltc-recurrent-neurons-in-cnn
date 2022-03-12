@@ -8,7 +8,11 @@ if __name__ == '__main__':
     # record_dir = "records/covid_1/covid_crnet-3fc_1"
     # record_dir = "records/covid_1/covid_crnet-4fc_1"
     # record_dir = "records/covid_1/covid_crnet-3fc32_1"
-    record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horque_1"
+    # record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horque_1"
+    # record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horzig_1"
+    # record_dir = "records/covid_1/covid_crnet-yncp32_1"
+    # record_dir = "records/covid_1/covid_crnet-zncp32_1"
+    # record_dir = "records/covid_1/covid_crnet-zncp32bi_1"
     show_fig = False
 
     # get training name and log file path
