@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-yncp1024"
+    training_name = "covid_crnet-yncp1024ada"
     shuffler_version = 1
 
     # image params
@@ -29,10 +29,11 @@ if __name__ == '__main__':
 
     # models
     bi_directional = False
-    model = CRNetNCP_YRNN(  # custom version of crnet-yncp (sensory neurons: 16*64)
+    model = CRNetNCP_YRNN(  # custom version of crnet-yncp (adaptive sensory neurons: 16*128 -> 1024)
         in_channels=in_channels,
         ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (H x W): (27 x 27) -> (16 x 16)
-        ncp_feature_shrink=64,  # number of information in z: 128 -> 64
+        ncp_feature_shrink=128,  # number of information in z: 128 -> 128 (double conv)
+        adaptive_ncp_sensory=1024,
         inter_neurons=192,
         command_neurons=48,
         motor_neurons=4,
