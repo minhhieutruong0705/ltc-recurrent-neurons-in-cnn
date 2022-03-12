@@ -3,15 +3,25 @@ import os
 from utils_log_file_processing import parse_log, track_training, get_stats
 
 if __name__ == '__main__':
-    shuffler_version = 1
     # record_dir = "records/covid_1/covid_crnet_1"
+    # record_dir = "records/covid_2/covid_crnet_2"
+
     # record_dir = "records/covid_1/covid_crnet-3fc_1"
+
     # record_dir = "records/covid_1/covid_crnet-4fc_1"
+    # record_dir = "records/covid_2/covid_crnet-4fc_2"
+
     # record_dir = "records/covid_1/covid_crnet-3fc32_1"
+    # record_dir = "records/covid_2/covid_crnet-3fc32_2"
+
     # record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horque_1"
+
     # record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horzig_1"
+
     # record_dir = "records/covid_1/covid_crnet-yncp32_1"
+
     # record_dir = "records/covid_1/covid_crnet-zncp32_1"
+
     # record_dir = "records/covid_1/covid_crnet-zncp32bi_1"
     show_fig = False
 
