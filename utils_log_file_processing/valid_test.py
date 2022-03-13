@@ -6,7 +6,9 @@ from utils_plot import plot_fig
 
 
 def track_training(data_dict, training_name, **plt_kwarg):
-    x = range(len(data_dict["[TRAIN]"]["Loss"]))  # number of epochs
+    n_epochs = len(data_dict["[TRAIN]"]["Loss"])
+    x = range(n_epochs)  # scatter x based on number of epochs
+    print(f"[INFO] Training of {training_name} is at {n_epochs} epochs!")
 
     # plot train loss
     plot_fig(fig_name=f"{training_name}_train_loss", x=x,
