@@ -32,7 +32,7 @@ if __name__ == '__main__':
     model = CRNetNCP_ZRNN(  # custom version of crnet-zncp (adaptive sensory neurons: 16*16 -> 1024)
         in_channels=in_channels,
         ncp_spatial_dim=16,  # RNN features: 16*16=256 < 1024; adaptive enhance number of features
-        ncp_feature_seq=128,  # RNN data sequence: 128
+        ncp_feature_seq=32,  # RNN data sequence: 32
         adaptive_ncp_sensory=1024,
         inter_neurons=192,
         command_neurons=48,
