@@ -7,6 +7,7 @@ if __name__ == '__main__':
     # record_dir = "records/covid_2/covid_crnet-1fc_2"
 
     # record_dir = "records/covid_1/covid_crnet-3fc_1"
+    # record_dir = "records/covid_2/covid_crnet-3fc_2"
 
     # record_dir = "records/covid_1/covid_crnet-4fc_1"
     # record_dir = "records/covid_2/covid_crnet-4fc_2"
@@ -17,8 +18,10 @@ if __name__ == '__main__':
     # record_dir = "records/covid_3/covid_crnet-3fc32_3"
 
     # record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horque_1"
+    # record_dir = "records/covid_2/covid_crnet-pncp32-chunk-horque_2"
 
     # record_dir = "records/covid_1/covid_crnet-pncp32-chunk-horzig_1"
+    # record_dir = "records/covid_2/covid_crnet-pncp32-chunk-horzig_2"
 
     # record_dir = "records/covid_1/covid_crnet-pncp32-slide-horque_1"
 
