@@ -28,8 +28,8 @@ if __name__ == '__main__':
             display_colum="run_id"
         )
         # append in the result list
-        result_by_model[model_name].append(mean_dict)
         result_by_model[model_name].append(std_dict)
+        result_by_model[model_name].append(mean_dict)
 
     # write csv file
     fieldnames = models_result_list[0].keys()

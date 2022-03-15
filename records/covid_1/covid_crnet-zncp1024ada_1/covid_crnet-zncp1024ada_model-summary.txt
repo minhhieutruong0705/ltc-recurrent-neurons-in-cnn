@@ -18,7 +18,7 @@ CRNetNCP_ZRNN(
     )
   )
   (bottleneck): BottleneckConvAvePool(
-    (conv): Conv2d(128, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (conv): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
     (ave_pooling): AdaptiveAvgPool2d(output_size=16)
   )
   (adaptive_shrink): Sequential(
@@ -29,7 +29,7 @@ CRNetNCP_ZRNN(
   (ncp_fc): NCP_FC(
     sensory_neurons=1024, inter_neurons=192, command_neurons=48, motor_neurons=4,
     sensory_outs=96, inter_outs=32, recurrent_dense=48, motor_ins=48,
-    seq_len=32, classes=2, bi_directional=False
+    seq_len=16, classes=2, bi_directional=False
     (ltc_fwd_seq): RNNSequence(
       (rnn_cell): LTCCell(
         (_clip): ReLU()
@@ -37,7 +37,7 @@ CRNetNCP_ZRNN(
     )
     (fc): Sequential(
       (0): Dropout(p=0.3, inplace=False)
-      (1): Linear(in_features=128, out_features=2, bias=True)
+      (1): Linear(in_features=64, out_features=2, bias=True)
     )
   )
 )
@@ -60,27 +60,27 @@ CRNetNCP_ZRNN                            --                        --
 │    │    └─Conv2d: 3-8                  [64, 128, 55, 55]         401,536
 │    │    └─ReLU: 3-9                    [64, 128, 55, 55]         --
 │    │    └─MaxPool2d: 3-10              [64, 128, 27, 27]         --
-├─BottleneckConvAvePool: 1-2             [64, 32, 16, 16]          --
-│    └─Conv2d: 2-4                       [64, 32, 27, 27]          36,896
-│    └─AdaptiveAvgPool2d: 2-5            [64, 32, 16, 16]          --
-├─Sequential: 1-3                        [64, 32, 1024]            --
-│    └─Dropout: 2-6                      [64, 32, 256]             --
-│    └─Linear: 2-7                       [64, 32, 1024]            263,168
-│    └─ReLU: 2-8                         [64, 32, 1024]            --
+├─BottleneckConvAvePool: 1-2             [64, 16, 16, 16]          --
+│    └─Conv2d: 2-4                       [64, 16, 27, 27]          18,448
+│    └─AdaptiveAvgPool2d: 2-5            [64, 16, 16, 16]          --
+├─Sequential: 1-3                        [64, 16, 1024]            --
+│    └─Dropout: 2-6                      [64, 16, 256]             --
+│    └─Linear: 2-7                       [64, 16, 1024]            263,168
+│    └─ReLU: 2-8                         [64, 16, 1024]            --
 ├─NCP_FC: 1-4                            [64, 2]                   --
-│    └─RNNSequence: 2-9                  [64, 32, 4]               --
+│    └─RNNSequence: 2-9                  [64, 16, 4]               --
 │    │    └─LTCCell: 3-11                --                        1,240,356
 │    └─Sequential: 2-10                  [64, 2]                   --
-│    │    └─Dropout: 3-12                [64, 128]                 --
-│    │    └─Linear: 3-13                 [64, 2]                   258
+│    │    └─Dropout: 3-12                [64, 64]                  --
+│    │    └─Linear: 3-13                 [64, 2]                   130
 ==========================================================================================
-Total params: 807,042
-Trainable params: 807,042
+Total params: 788,466
+Trainable params: 788,466
 Non-trainable params: 0
-Total mult-adds (G): 173.76
+Total mult-adds (G): 172.90
 ==========================================================================================
 Input size (MB): 38.54
-Forward/backward pass size (MB): 2274.87
-Params size (MB): 3.23
-Estimated Total Size (MB): 2316.63
+Forward/backward pass size (MB): 2260.51
+Params size (MB): 3.15
+Estimated Total Size (MB): 2302.20
 ==========================================================================================

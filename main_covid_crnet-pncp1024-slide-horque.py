@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNetNCP_YRNN
+from models import CRNetNCP_SlidePRNN
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-yncp1024"
+    training_name = "covid_crnet-pncp1024-slide-horque"
     shuffler_version = 1
 
     # image params
@@ -29,11 +29,15 @@ if __name__ == '__main__':
 
     # models
     bi_directional = False
-    model = CRNetNCP_YRNN(  # custom version of crnet-yncp (sensory neurons: 16*64 = 1024)
+    seq_horizontal = True
+    seq_zigzag = False
+    model = CRNetNCP_SlidePRNN(  # custom version of crnet-pncp (sensory neurons: 4*4*64 -> 1024)
         in_channels=in_channels,
-        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (H x W): (27 x 27) -> (16 x 16)
-        ncp_feature_shrink=64,  # number of information in z: 128 -> 64
-        adaptive_ncp_sensory=None,  # sensory neurons: ncp_spatial_dim*ncp_feature_shrink
+        ncp_spatial_dim=11,  # reduce information in x-y space: 27x27 -> 11x11 (create data sequence of 16)
+        ncp_window_size=4,  # spatial dimensions of a patch
+        ncp_window_stride=2,  # overlap rate of patches is 50%
+        ncp_features_shrink=64,  # reduce information in z axis: 128 -> 64
+        adaptive_ncp_sensory=None,  # sensory neurons: ncp_window_size**2*ncp_feature_shrink
         inter_neurons=192,
         command_neurons=48,
         motor_neurons=4,
@@ -41,8 +45,10 @@ if __name__ == '__main__':
         inter_outs=32,
         recurrent_dense=48,
         motor_ins=48,
-        bi_directional=bi_directional
-    ).cuda()  # ncp: 16*64 -> 192 -> 48 -> 4; classification: 16*4 -> 2
+        bi_directional=bi_directional,
+        seq_horizontal=seq_horizontal,
+        seq_zigzag=seq_zigzag
+    ).cuda()  # ncp: 4*4*64 -> 192 -> 48 -> 4; classification: 16*4 -> 2
     print(model)
     model_summary = torchinfo.summary(
         model=model,
