@@ -6,7 +6,7 @@ from utils_dictionary import group_dictionaries_by_attribute, get_mean_std_of_di
 from stats_files_uitls import get_test_result
 
 if __name__ == '__main__':
-    summary_file = "summary_models.csv"
+    summary_file = "covid-models_summary.csv"
     stats_files = glob.glob("../records/covid*/*/*/*_stats.txt")  # get all statistic files
 
     # get all the models result
