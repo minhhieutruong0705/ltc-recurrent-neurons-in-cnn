@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 95.439583, Standard Deviation: 0.302538, Standard Error: 0.061755
+Max: 96.05, Min: 94.84
+
+[VALID]:F1:
+Mean: 95.519583, Standard Deviation: 0.303267, Standard Error: 0.061904
+Max: 96.10, Min: 94.74
+
+[VALID]:Dice:
+Mean: 91.423333, Standard Deviation: 0.553562, Standard Error: 0.112995
+Max: 92.48, Min: 90.00
+
+Test result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):
+[TEST] Epoch 124: Loss: 0.0856, Acc: 96.13, F1: 96.24, Dice: 92.76, Pre: 0.94, Re: 0.99, TP: 461, TN: 433, FP: 32, FN: 4

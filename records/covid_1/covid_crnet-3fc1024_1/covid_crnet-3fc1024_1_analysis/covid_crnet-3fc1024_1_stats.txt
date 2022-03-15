@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 96.393333, Standard Deviation: 0.282351, Standard Error: 0.057635
+Max: 96.85, Min: 95.73
+
+[VALID]:F1:
+Mean: 96.418750, Standard Deviation: 0.289530, Standard Error: 0.059100
+Max: 96.86, Min: 95.66
+
+[VALID]:Dice:
+Mean: 93.084167, Standard Deviation: 0.539667, Standard Error: 0.110159
+Max: 93.92, Min: 91.68
+
+Test result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):
+[TEST] Epoch 113: Loss: 0.0856, Acc: 95.48, F1: 95.52, Dice: 91.43, Pre: 0.95, Re: 0.96, TP: 448, TN: 440, FP: 25, FN: 17

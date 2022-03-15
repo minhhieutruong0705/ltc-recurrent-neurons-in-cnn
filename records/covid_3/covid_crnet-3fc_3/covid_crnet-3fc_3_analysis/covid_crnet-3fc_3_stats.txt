@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 96.386667, Standard Deviation: 0.197287, Standard Error: 0.040271
+Max: 96.77, Min: 95.97
+
+[VALID]:F1:
+Mean: 96.426667, Standard Deviation: 0.192650, Standard Error: 0.039324
+Max: 96.84, Min: 95.96
+
+[VALID]:Dice:
+Mean: 93.100000, Standard Deviation: 0.358504, Standard Error: 0.073179
+Max: 93.87, Min: 92.24
+
+Test result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):
+[TEST] Epoch 145: Loss: 0.0852, Acc: 97.85, F1: 97.86, Dice: 95.81, Pre: 0.97, Re: 0.98, TP: 457, TN: 453, FP: 12, FN: 8
