@@ -36,5 +36,5 @@ if __name__ == '__main__':
     with open(summary_file, 'w') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
-        for model_name in result_by_model.keys():
+        for model_name in sorted(result_by_model.keys()):
             writer.writerows(result_by_model[model_name])
