@@ -27,3 +27,4 @@ def plot_fig(fig_name, x, ys, y_names, bound_value, save_dir=None, show_fig=True
         plt.savefig(os.path.join(save_dir, fig_name + ".png"))
     if show_fig:
         plt.show()
+    plt.close()
