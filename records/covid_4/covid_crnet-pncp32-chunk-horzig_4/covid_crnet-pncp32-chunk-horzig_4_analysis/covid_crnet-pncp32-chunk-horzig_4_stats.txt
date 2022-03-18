@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 50.000000, Standard Deviation: 0.000000, Standard Error: 0.000000
+Max: 50.00, Min: 50.00
+
+[VALID]:F1:
+Mean: 66.670000, Standard Deviation: 0.000000, Standard Error: 0.000000
+Max: 66.67, Min: 66.67
+
+[VALID]:Dice:
+Mean: 50.000000, Standard Deviation: 0.000000, Standard Error: 0.000000
+Max: 50.00, Min: 50.00
+
+Test result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):
+[TEST] Epoch 0: Loss: 0.1017, Acc: 50.00, F1: 66.67, Dice: 50.00, Pre: 0.50, Re: 1.00, TP: 465, TN: 0, FP: 465, FN: 0

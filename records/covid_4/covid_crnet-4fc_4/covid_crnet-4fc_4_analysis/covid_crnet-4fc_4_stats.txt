@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 95.791667, Standard Deviation: 0.201363, Standard Error: 0.041103
+Max: 96.21, Min: 95.40
+
+[VALID]:F1:
+Mean: 95.887500, Standard Deviation: 0.195454, Standard Error: 0.039897
+Max: 96.30, Min: 95.48
+
+[VALID]:Dice:
+Mean: 92.100833, Standard Deviation: 0.360300, Standard Error: 0.073546
+Max: 92.87, Min: 91.35
+
+Test result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):
+[TEST] Epoch 93: Loss: 0.0866, Acc: 95.38, F1: 95.51, Dice: 91.40, Pre: 0.93, Re: 0.98, TP: 457, TN: 430, FP: 35, FN: 8
