@@ -1,15 +1,15 @@
 
 [VALID]:Acc:
-Mean: 50.000000, Standard Deviation: 0.000000, Standard Error: 0.000000
-Max: 50.00, Min: 50.00
+Mean: 95.315417, Standard Deviation: 0.348903, Standard Error: 0.071219
+Max: 95.89, Min: 94.44
 
 [VALID]:F1:
-Mean: nan, Standard Deviation: nan, Standard Error: nan
-Max: nan, Min: nan
+Mean: 95.427500, Standard Deviation: 0.361251, Standard Error: 0.073740
+Max: 95.99, Min: 94.49
 
 [VALID]:Dice:
-Mean: 20.833333, Standard Deviation: 24.650332, Standard Error: 5.031728
-Max: 50.00, Min: 0.00
+Mean: 91.260417, Standard Deviation: 0.657226, Standard Error: 0.134156
+Max: 92.28, Min: 89.56
 
 Test result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):
-[TEST] Epoch 11: Loss: 0.1017, Acc: 50.00, F1: 66.67, Dice: 50.00, Pre: 0.50, Re: 1.00, TP: 465, TN: 0, FP: 465, FN: 0
+[TEST] Epoch 152: Loss: 0.0866, Acc: 96.24, F1: 96.34, Dice: 92.94, Pre: 0.94, Re: 0.99, TP: 461, TN: 434, FP: 31, FN: 4
