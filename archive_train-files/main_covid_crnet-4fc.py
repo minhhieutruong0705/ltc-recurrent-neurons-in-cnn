@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNetNCP_SlidePRNN
+from models import CRNet_4FC
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-pncp32-slide-horque"
+    training_name = "covid_crnet-4fc"
     shuffler_version = 1
 
     # image params
@@ -28,15 +28,7 @@ if __name__ == '__main__':
     in_channels = 3 if not lung_mask_incor else 4
 
     # models
-    bi_directional = False
-    seq_horizontal = True
-    seq_zigzag = False
-    model = CRNetNCP_SlidePRNN(
-        in_channels=in_channels,
-        bi_directional=bi_directional,
-        seq_horizontal=seq_horizontal,
-        seq_zigzag=seq_zigzag
-    ).cuda()
+    model = CRNet_4FC(in_channels=in_channels).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
@@ -79,8 +71,8 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path for images
-    covid_dir = "../datasets/Dataset_Covid/COVID"
-    non_covid_dir = "../datasets/Dataset_Covid/NONCOVID"
+    covid_dir = "../../datasets/Dataset_Covid/COVID"
+    non_covid_dir = "../../datasets/Dataset_Covid/NONCOVID"
 
     # path for train, validation, and test sets
     train_covid_file = f"records/covid_{shuffler_version}/covid_train_{shuffler_version}.txt"

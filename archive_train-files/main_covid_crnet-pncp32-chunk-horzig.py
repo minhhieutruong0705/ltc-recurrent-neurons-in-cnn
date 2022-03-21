@@ -79,8 +79,8 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path for images
-    covid_dir = "../datasets/Dataset_Covid/COVID"
-    non_covid_dir = "../datasets/Dataset_Covid/NONCOVID"
+    covid_dir = "../../datasets/Dataset_Covid/COVID"
+    non_covid_dir = "../../datasets/Dataset_Covid/NONCOVID"
 
     # path for train, validation, and test sets
     train_covid_file = f"records/covid_{shuffler_version}/covid_train_{shuffler_version}.txt"
