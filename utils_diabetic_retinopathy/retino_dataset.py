@@ -53,7 +53,6 @@ class DiabeticRetinopathyDataset(Dataset):
         return instance_count
 
     def get_reverse_class_weight(self):
-        rev_weight = []
         instance_count = self.__count_instances__()
         rev_weight = [instance_count[class_id] for class_id in sorted(instance_count.keys())]
         return max(rev_weight) / rev_weight
