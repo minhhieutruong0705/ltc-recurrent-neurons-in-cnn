@@ -72,8 +72,8 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path for images
-    train_image_dir = "../datasets/Dataset_DiabeticRetinopathy/train"
-    test_image_dir = "../datasets/Dataset_DiabeticRetinopathy/test"
+    train_image_dir = "../datasets/Dataset_DiabeticRetinopathy/train_small"
+    test_image_dir = "../datasets/Dataset_DiabeticRetinopathy/test_small"
 
     # path for train, validation, and test sets
     train_retino_file = f"records/retino_{shuffler_version}/retino_train_{shuffler_version}.csv"
