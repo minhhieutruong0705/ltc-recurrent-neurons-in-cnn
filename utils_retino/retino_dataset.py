@@ -17,7 +17,7 @@ def read_list(path):
         for line in csv_reader:
             lines.append({
                 "image_name": f"{line['image']}.jpeg",
-                "label": float(line["level"])
+                "label": int(line["level"])
             })
     return lines
 

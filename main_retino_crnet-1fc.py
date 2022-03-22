@@ -22,12 +22,14 @@ if __name__ == '__main__':
     # train params
     epochs = 175
     batch_size = 64
+    data_load_workers = 3
     learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
+    classes = 5
 
     # models
-    model = CRNet(in_channels=in_channels).cuda()
+    model = CRNet(in_channels=in_channels, classes=classes).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
@@ -96,9 +98,10 @@ if __name__ == '__main__':
         list_train=train_retino_file,
         list_val=val_retino_file,
         list_test=test_retino_file,
-        batch_size=batch_size,
         train_transformer=train_transformer,
         val_transformer=val_transformer,
+        batch_size=batch_size,
+        data_load_workers=data_load_workers
     )
 
     # init
@@ -106,7 +109,7 @@ if __name__ == '__main__':
     loss_function = BCEDiceLossWithLogistic(
         bce_weight=1.0,
         dice_weight=1.0,
-        class_weights=bce_class_weight,
+        class_weights=torch.tensor(bce_class_weight).cuda(),
         reduction=loss_reduction
     ).cuda()
     # loss_function = nn.MSELoss(reduction=loss_reduction).cuda()

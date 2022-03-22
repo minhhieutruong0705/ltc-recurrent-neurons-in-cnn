@@ -11,7 +11,7 @@ def get_data_loaders(
         train_dir, test_dir,
         list_train, list_val, list_test,
         train_transformer, val_transformer,
-        batch_size
+        batch_size, data_load_workers
 ):
     print("[INFO] Loading train dataset ...")
     train_dataset = DiabeticRetinopathyDataset(
@@ -38,19 +38,22 @@ def get_data_loaders(
     train_loader = DataLoader(
         dataset=train_dataset,
         batch_size=batch_size,
-        shuffle=True
+        shuffle=True,
+        num_workers=data_load_workers
     )
 
     val_loader = DataLoader(
         dataset=val_dataset,
         batch_size=batch_size,
-        shuffle=False
+        shuffle=False,
+        num_workers=data_load_workers
     )
 
     test_loader = DataLoader(
         dataset=test_dataset,
         batch_size=batch_size,
-        shuffle=False
+        shuffle=False,
+        num_workers=data_load_workers
     )
     return train_loader, val_loader, test_loader, rev_class_weight
 
