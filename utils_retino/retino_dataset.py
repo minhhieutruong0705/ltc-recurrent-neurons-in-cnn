@@ -2,7 +2,6 @@ import os
 import csv
 import numpy as np
 import cv2
-import torch
 
 from PIL import Image
 import albumentations as A
@@ -12,10 +11,10 @@ from torch.utils.data import Dataset
 
 
 def read_list(path):
+    lines = []
     with open(path, 'r') as f:
-        lines = []
-        reader = csv.DictReader(f)
-        for line in reader:
+        csv_reader = csv.DictReader(f)
+        for line in csv_reader:
             lines.append({
                 "image_name": f"{line['image']}.jpeg",
                 "label": float(line["level"])
