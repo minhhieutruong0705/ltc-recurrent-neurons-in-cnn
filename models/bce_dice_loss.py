@@ -4,11 +4,12 @@ import torch.nn.functional as F
 
 
 class BCEDiceLossWithLogistic(nn.Module):
-    def __init__(self, reduction="mean", bce_weight=0.4, dice_weight=1.0):
+    def __init__(self, reduction="mean", bce_weight=0.4, dice_weight=1.0, class_weights=None):
         super().__init__()
         self.reduction = reduction
         self.bce_weight = bce_weight
         self.dice_weight = dice_weight
+        self.class_weights = class_weights
 
     def forward(self, predictions, ground_truth):
         assert predictions.size() == ground_truth.size()
@@ -24,7 +25,8 @@ class BCEDiceLossWithLogistic(nn.Module):
         bce_loss = F.binary_cross_entropy_with_logits(
             input=predictions,
             target=ground_truth,
-            reduction=self.reduction
+            reduction=self.reduction,
+            weight=self.class_weights
         )
 
         bce_dice_loss = bce_loss * self.bce_weight + dice_loss * self.dice_weight
