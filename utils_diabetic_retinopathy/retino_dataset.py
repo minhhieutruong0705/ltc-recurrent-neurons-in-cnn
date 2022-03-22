@@ -55,7 +55,7 @@ class DiabeticRetinopathyDataset(Dataset):
     def get_reverse_class_weight(self):
         instance_count = self.__count_instances__()
         rev_weight = [instance_count[class_id] for class_id in sorted(instance_count.keys())]
-        return max(rev_weight) / rev_weight
+        return max(rev_weight) / np.array(rev_weight)
 
     def __getitem__(self, index):
         image_path = os.path.join(self.image_dir, self.data_instances[index]["image_name"])
@@ -88,12 +88,15 @@ if __name__ == '__main__':
         ), ToTensorV2()
     ])
 
-    covid_train_dataset = DiabeticRetinopathyDataset(
-        image_dir="../../datasets/Dataset_DiabeticRetinopathy/sample",
+    retino_train_dataset = DiabeticRetinopathyDataset(
+        image_dir="../../datasets/Dataset_DiabeticRetinopathy/train",
         data_list="../../datasets/Dataset_DiabeticRetinopathy/trainLabels.csv",
         transform=train_transformer
     )
 
-    image, label = covid_train_dataset.__getitem__(6)
+    image, label = retino_train_dataset.__getitem__(6)
     transforms.ToPILImage()(image).show()
     print(label)
+
+    rev_class_weight = retino_train_dataset.get_reverse_class_weight()
+    print(rev_class_weight)
