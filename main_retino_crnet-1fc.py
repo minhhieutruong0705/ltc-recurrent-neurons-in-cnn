@@ -115,7 +115,7 @@ if __name__ == '__main__':
     scaler = torch.cuda.amp.GradScaler()
 
     # trainer
-    covid_trainer = DiabeticRetinopathyTrainer(
+    retino_trainer = DiabeticRetinopathyTrainer(
         model=model,
         train_loader=train_loader,
         loss_function=loss_function,
@@ -126,7 +126,7 @@ if __name__ == '__main__':
     print("[INFO] Trainer loaded!")
 
     # validator
-    covid_validator = DiabeticRetinopathyValidator(
+    retino_validator = DiabeticRetinopathyValidator(
         model=model,
         val_loader=val_loader,
         loss_function=loss_function,
@@ -138,10 +138,10 @@ if __name__ == '__main__':
     for i in range(epochs):
         print(f"\n[INFO] {i + 1}/{epochs} epochs")
         # train
-        loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_trainer.train()
+        loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = retino_trainer.train()
         log_to_file(train_log_file, "TRAIN", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
         # eval
-        loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_validator.eval()
+        loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = retino_validator.eval()
         log_to_file(train_log_file, "VALID", i, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
         # set checkpoint
         checkpoint = {
@@ -165,7 +165,7 @@ if __name__ == '__main__':
             )
 
     # tester
-    covid_tester = DiabeticRetinopathyValidator(
+    retino_tester = DiabeticRetinopathyValidator(
         model=model,
         val_loader=test_loader,
         loss_function=loss_function,
@@ -176,5 +176,5 @@ if __name__ == '__main__':
     # test
     checkpoint_file = os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
     best_epoch = load_checkpoint(checkpoint_file=checkpoint_file, model=model, optimizer=optimizer)
-    loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = covid_tester.eval()
+    loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = retino_tester.eval()
     log_to_file(train_log_file, "TEST", best_epoch, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
