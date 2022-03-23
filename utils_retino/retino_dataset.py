@@ -54,7 +54,7 @@ class DiabeticRetinopathyDataset(Dataset):
     def get_reverse_class_weight(self):
         instance_count = self.__count_instances__()
         rev_weight = [instance_count[class_id] for class_id in sorted(instance_count.keys())]
-        return min(rev_weight) / np.array(rev_weight)
+        return max(rev_weight) / np.array(rev_weight)
 
     def __getitem__(self, index):
         image_path = os.path.join(self.image_dir, self.data_instances[index]["image_name"])

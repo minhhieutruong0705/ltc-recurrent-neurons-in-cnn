@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class CCEMicroDiceLossWithSoftmax(nn.Module):
-    def __init__(self, reduction="mean", cce_weight=1.0, dice_weight=0.3, class_weights=None):
+    def __init__(self, reduction="mean", cce_weight=1.0, dice_weight=0.8, class_weights=None):
         super().__init__()
         self.reduction = reduction
         self.cce_weight = cce_weight

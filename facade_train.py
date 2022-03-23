@@ -55,13 +55,17 @@ def load_checkpoint(checkpoint_file, model, optimizer):
 def draw_confusion_matrix(matrix, class_names, fig_name, save_dir, normalize=True):
     if normalize:
         matrix = matrix.astype(float) / matrix.sum(axis=1)[:, np.newaxis]
+    # convert to dataframe
     matrix_df = pd.DataFrame(
         data=matrix,
         index=[class_name for class_name in class_names],
         columns=[class_name for class_name in class_names]
     )
+
+    # plot figure
     plt.figure(figsize=(12, 7))
-    sn.set_palette("Oranges")
-    sn.heatmap(matrix_df, annot=True)
+    plt.title(fig_name)
+    heat_map = sn.heatmap(matrix_df, annot=True)
+    heat_map.set(xlabel="Prediction", ylabel="Ground Truth")
     plt.savefig(os.path.join(save_dir, f"{fig_name}.png"))
     plt.close()

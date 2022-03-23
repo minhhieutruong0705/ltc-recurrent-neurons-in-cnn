@@ -21,7 +21,7 @@ if __name__ == '__main__':
     img_crop_dim = 224
 
     # train params
-    epochs = 175
+    epochs = 400
     batch_size = 64
     data_load_workers = 3
     learning_rate = 1e-4
