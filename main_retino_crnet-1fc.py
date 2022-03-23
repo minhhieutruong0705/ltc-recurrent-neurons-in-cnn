@@ -8,8 +8,9 @@ from models import CRNet
 from models import CCEMicroDiceLossWithSoftmax
 from utils_retino import DiabeticRetinopathyTrainer
 from utils_retino import DiabeticRetinopathyValidator
+from utils_retino import DiabeticRetinopathyTester
 from facade_retino import get_transformers, get_data_loaders
-from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
+from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint, draw_confusion_matrix
 
 if __name__ == '__main__':
     training_name = "retino_crnet-1fc"
@@ -26,7 +27,8 @@ if __name__ == '__main__':
     learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
-    classes = 5
+    class_names = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
+    classes = len(class_names)
 
     # models
     model = CRNet(in_channels=in_channels, classes=classes).cuda()
@@ -166,16 +168,22 @@ if __name__ == '__main__':
             )
 
     # tester
-    retino_tester = DiabeticRetinopathyValidator(
+    retino_tester = DiabeticRetinopathyTester(
         model=model,
         val_loader=test_loader,
         loss_function=loss_function,
         device=device,
-        is_test=True
     )
 
     # test
     checkpoint_file = os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
     best_epoch = load_checkpoint(checkpoint_file=checkpoint_file, model=model, optimizer=optimizer)
-    loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn = retino_tester.eval()
+    loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn, confusion_matrix = retino_tester.test()
     log_to_file(train_log_file, "TEST", best_epoch, loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn)
+    draw_confusion_matrix(
+        matrix=confusion_matrix,
+        class_names=class_names,
+        fig_name=f"{training_name}_{shuffler_version}_cfm",
+        save_dir=record_dir,
+        normalize=True
+    )

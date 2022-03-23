@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from tqdm import tqdm
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 
 class DiabeticRetinopathyTrainer():
@@ -14,12 +15,13 @@ class DiabeticRetinopathyTrainer():
 
     def train(self):
         total_train_loss = 0
-        tp = tn = fp = fn = 0
+        total_prediction_category = []
+        total_ground_truth_category = []
 
         loop = tqdm(self.loader)
         self.model.train()
 
-        for batch_index, (image, label) in enumerate(loop):
+        for index, (image, label) in enumerate(loop):
             x = image.to(self.device)
             label = label.long().to(self.device)
 
@@ -37,26 +39,46 @@ class DiabeticRetinopathyTrainer():
 
             # pause gradient calculation
             with torch.no_grad():
-                prediction_no_grad = prediction.argmax(dim=1, keepdim=True)
-                ground_truth_no_grad = label.view_as(prediction_no_grad)
+                prediction_category = prediction.argmax(dim=1)
+                ground_truth_category = label.view_as(prediction_category)
 
-                tp += (prediction_no_grad * ground_truth_no_grad).sum()
-                tn += ((1 - prediction_no_grad).abs() * (1 - ground_truth_no_grad).abs()).sum()
-                fp += (prediction_no_grad * (1 - ground_truth_no_grad).abs()).sum()
-                fn += ((1 - prediction_no_grad).abs() * ground_truth_no_grad).sum()
+                # store prediction and ground truth of each iteration
+                total_prediction_category.extend(prediction_category.detach().cpu().numpy())
+                total_ground_truth_category.extend(ground_truth_category.detach().cpu().numpy())
 
             loop.set_postfix(loss=loss_no_grad.item())
             total_train_loss += loss_no_grad.item()
 
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
+        assert len(total_prediction_category) == len(total_ground_truth_category)
 
-        f1 = 2 * precision * recall / (precision + recall) * 100
-        accuracy = (tp + tn) / (tp + tn + fp + fn) * 100
-        dice = tp / (fp + fn + tp) * 100
+        # calculate accuracy
+        accuracy = accuracy_score(total_ground_truth_category, total_prediction_category) * 100
+
+        # calculate precision, recall, anf f1 score (macro)
+        precision = precision_score(total_ground_truth_category, total_prediction_category, average="macro")
+        recall = recall_score(total_ground_truth_category, total_prediction_category, average="macro")
+        f1 = f1_score(total_ground_truth_category, total_prediction_category, average="macro") * 100
+
+        # confusion matrix for each class
+        matrix = confusion_matrix(total_ground_truth_category, total_prediction_category)
+        fp_classes = matrix.sum(axis=0) - np.diag(matrix)
+        fn_classes = matrix.sum(axis=1) - np.diag(matrix)
+        tp_classes = np.diag(matrix)
+        tn_classes = matrix.sum() - (fp_classes + fn_classes + tp_classes)
+
+        # macro dice for positive classes
+        dice_classes = tp_classes / (tp_classes + fp_classes + fn_classes)
+        dice = np.average(dice_classes[1:]) * 100
+
+        # confusion considering class 0 is negative and others are positive
+        tp = tp_classes[1:].sum()
+        tn = tp_classes[0]
+        fp = fp_classes[1:].sum()
+        fn = fp_classes[0]
+
         avg_train_loss = total_train_loss / len(self.loader)
 
         print("\n[TRAIN]:          Training Loss: {:.6f}".format(avg_train_loss))
         print(f"[Classification]: Dice: {dice:2f}, Acc: {accuracy:2f}, F1: {f1:2f},")
-        print(f"[Confusion]:      TP: {tp.item()}, TN: {tn.item()}, FP: {fp.item()}, FN: {fn.item()}")
+        print(f"[Confusion]:      TP: {tp}, TN: {tn}, FP: {fp}, FN: {fn}")  # all classes
         return avg_train_loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn

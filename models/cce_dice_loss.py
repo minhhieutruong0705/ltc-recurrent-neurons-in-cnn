@@ -16,10 +16,11 @@ class CCEMicroDiceLossWithSoftmax(nn.Module):
         assert ground_truth.max() <= 1 and ground_truth.min() >= 0
 
         # micro dice loss
-        prediction_binary = predictions.argmax(dim=1, keepdim=True) > 0
-        ground_truth_binary = ground_truth.argmax(dim=1, keepdim=True) > 0
-        intersection = (prediction_binary * ground_truth_binary).sum()
-        union = prediction_binary.sum() + ground_truth_binary.sum()
+        prediction_category = predictions.argmax(dim=1)
+        ground_truth_category = ground_truth.argmax(dim=1)
+        similarity_mask = torch.eq(prediction_category, ground_truth_category)
+        intersection = (ground_truth_category.bool() * similarity_mask).sum()
+        union = prediction_category.bool().sum() + ground_truth_category.bool().sum()
         dice_loss = 1 - (2 * intersection) / union
 
         # activation

@@ -4,15 +4,15 @@ from tqdm import tqdm
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
 
 
-class DiabeticRetinopathyValidator():
+class DiabeticRetinopathyTester():
     def __init__(self, model, val_loader, loss_function, device):
         self.model = model
         self.loader = val_loader
         self.loss_fn = loss_function
         self.device = device
 
-    def eval(self):
-        total_eval_loss = 0
+    def test(self):
+        total_test_loss = 0
         total_prediction_category = []
         total_ground_truth_category = []
 
@@ -37,7 +37,7 @@ class DiabeticRetinopathyValidator():
                 total_ground_truth_category.extend(ground_truth_category.detach().cpu().numpy())
 
             loop.set_postfix(loss=loss.item())
-            total_eval_loss += loss.item()
+            total_test_loss += loss.item()
 
         assert len(total_prediction_category) == len(total_ground_truth_category)
 
@@ -66,10 +66,10 @@ class DiabeticRetinopathyValidator():
         fp = fp_classes[1:].sum()
         fn = fp_classes[0]
 
-        avg_eval_loss = total_eval_loss / len(self.loader)
+        avg_test_loss = total_test_loss / len(self.loader)
 
-        print("\n[VALID]:          "
-              f"Validation Loss: {avg_eval_loss:.6f}")
+        print("\n[TEST]:          "
+              f"Test Loss: {avg_test_loss:.6f}")
         print(f"[Classification]: Dice: {dice:2f}, Acc: {accuracy:2f}, F1: {f1:2f},")
-        print(f"[Confusion]:      TP: {tp}, TN: {tn}, FP: {fp}, FN: {fn}")  # all classes
-        return avg_eval_loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn
+        print(f"[Confusion]:      TP: {tp}, TN: {tn}, FP: {fp}, FN: {fn}")
+        return avg_test_loss, accuracy, f1, dice, precision, recall, tp, tn, fp, fn, matrix

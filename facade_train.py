@@ -1,5 +1,10 @@
+import os
+import numpy as np
 import torch
 import torch.nn as nn
+import seaborn as sn
+import pandas as pd
+import matplotlib.pyplot as plt
 
 
 # call back by a model to initialize its weights
@@ -44,3 +49,19 @@ def load_checkpoint(checkpoint_file, model, optimizer):
     optimizer.load_state_dict(checkpoint_state["optimizer"])
     print("[INFO] Checkpoint loaded")
     return checkpoint_state["epoch"]
+
+
+# draw confusion matrix
+def draw_confusion_matrix(matrix, class_names, fig_name, save_dir, normalize=True):
+    if normalize:
+        matrix = matrix.astype(float) / matrix.sum(axis=1)[:, np.newaxis]
+    matrix_df = pd.DataFrame(
+        data=matrix,
+        index=[class_name for class_name in class_names],
+        columns=[class_name for class_name in class_names]
+    )
+    plt.figure(figsize=(12, 7))
+    sn.set_palette("Oranges")
+    sn.heatmap(matrix_df, annot=True)
+    plt.savefig(os.path.join(save_dir, f"{fig_name}.png"))
+    plt.close()
