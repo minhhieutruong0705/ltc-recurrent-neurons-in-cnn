@@ -5,7 +5,7 @@ import torchinfo
 import os
 
 from models import CRNet
-from models import BCEDiceLossWithLogistic
+from models import CCEMicroDiceLossWithSoftmax
 from utils_retino import DiabeticRetinopathyTrainer
 from utils_retino import DiabeticRetinopathyValidator
 from facade_retino import get_transformers, get_data_loaders
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     )
 
     # data loaders
-    train_loader, val_loader, test_loader, bce_class_weight = get_data_loaders(
+    train_loader, val_loader, test_loader, cce_class_weight = get_data_loaders(
         train_dir=train_image_dir,
         test_dir=test_image_dir,
         list_train=train_retino_file,
@@ -106,10 +106,8 @@ if __name__ == '__main__':
 
     # init
     model.apply(init_weights)
-    loss_function = BCEDiceLossWithLogistic(
-        bce_weight=1.0,
-        dice_weight=1.0,
-        class_weights=torch.tensor(bce_class_weight).cuda(),
+    loss_function = CCEMicroDiceLossWithSoftmax(
+        class_weights=torch.tensor(cce_class_weight, device=device),
         reduction=loss_reduction
     ).cuda()
     # loss_function = nn.MSELoss(reduction=loss_reduction).cuda()
