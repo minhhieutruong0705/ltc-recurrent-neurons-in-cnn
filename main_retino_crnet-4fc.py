@@ -5,7 +5,7 @@ import torchinfo
 import os
 
 from models import CRNet_4FC
-from models import CCEMicroDiceLossWithSoftmax
+from models import WeightedCCEDiceLossWithSoftmax
 from utils_retino import DiabeticRetinopathyTrainer
 from utils_retino import DiabeticRetinopathyValidator
 from utils_retino import DiabeticRetinopathyTester
@@ -105,10 +105,11 @@ if __name__ == '__main__':
         batch_size=batch_size,
         data_load_workers=data_load_workers
     )
+    print("[INFO] Loss weighted:", cce_class_weight)
 
     # init
     model.apply(init_weights)
-    loss_function = CCEMicroDiceLossWithSoftmax(
+    loss_function = WeightedCCEDiceLossWithSoftmax(
         class_weights=torch.tensor(cce_class_weight, device=device),
         reduction=loss_reduction
     ).cuda()

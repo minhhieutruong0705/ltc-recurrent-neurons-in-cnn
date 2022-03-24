@@ -19,7 +19,7 @@ def get_data_loaders(
         data_list=list_train,
         transform=train_transformer
     )
-    rev_class_weight = train_dataset.get_reverse_class_weight()
+    rev_class_weight = train_dataset.get_class_weight()
 
     print("[INFO] Loading validation dataset ...")
     val_dataset = DiabeticRetinopathyDataset(

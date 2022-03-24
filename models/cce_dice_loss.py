@@ -3,25 +3,39 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class CCEMicroDiceLossWithSoftmax(nn.Module):
-    def __init__(self, reduction="mean", cce_weight=1.0, dice_weight=0.8, class_weights=None):
+class WeightedCCEDiceLossWithSoftmax(nn.Module):
+    def __init__(self, class_weights, reduction="mean", cce_weight=0.6, dice_weight=1.0):
         super().__init__()
+        self.class_weights = class_weights
         self.reduction = reduction
         self.cce_weight = cce_weight
         self.dice_weight = dice_weight
-        self.class_weights = class_weights
 
     def forward(self, predictions, ground_truth):
         assert predictions.size() == ground_truth.size()
         assert ground_truth.max() <= 1 and ground_truth.min() >= 0
 
-        # micro dice loss
         prediction_category = predictions.argmax(dim=1)
         ground_truth_category = ground_truth.argmax(dim=1)
-        similarity_mask = torch.eq(prediction_category, ground_truth_category)
-        intersection = (ground_truth_category.bool() * similarity_mask).sum()
-        union = prediction_category.bool().sum() + ground_truth_category.bool().sum()
-        dice_loss = 1 - (2 * intersection) / union
+
+        # # micro dice loss
+        # similarity_mask = torch.eq(prediction_category, ground_truth_category)
+        # intersection = (ground_truth_category.bool() * similarity_mask).sum()
+        # union = prediction_category.bool().sum() + ground_truth_category.bool().sum()
+        # dice_loss = 1 - (2 * intersection) / union
+
+        # confusion matrix
+        n_classes = len(self.class_weights)
+        confusion_matrix = torch.zeros(n_classes, n_classes)
+        for truth, prediction in zip(ground_truth_category, prediction_category):
+            confusion_matrix[truth, prediction] += 1
+        tp_classes = confusion_matrix.diag()
+        fp_classes = confusion_matrix.sum(dim=0) - tp_classes
+        fn_classes = confusion_matrix.sum(dim=1) - tp_classes
+
+        # weighted dice loss
+        dice = tp_classes / (tp_classes + fp_classes + fn_classes)
+        dice_loss = ((1 - dice) * self.class_weights).sum()
 
         # activation
         predictions_softmax = predictions.softmax(dim=1)
@@ -41,6 +55,6 @@ class CCEMicroDiceLossWithSoftmax(nn.Module):
 if __name__ == '__main__':
     x = torch.randn(16, 5)
     y = torch.randint(0, 2, (16, 5)).float()
-    loss_fn = CCEMicroDiceLossWithSoftmax()
+    loss_fn = WeightedCCEDiceLossWithSoftmax()
     loss = loss_fn(x, y)
     print(loss)

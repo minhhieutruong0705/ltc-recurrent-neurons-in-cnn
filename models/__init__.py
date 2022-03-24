@@ -12,4 +12,4 @@ from .crnet_ncp_prnn_chunk import CRNetNCP_ChunkPRNN
 from .crnet_ncp_prnn_slide import CRNetNCP_SlidePRNN
 from .crnet_ncp_xyrnn import CRNetNCP_XYRNN
 from .bce_dice_loss import BCEDiceLossWithLogistic
-from .cce_dice_loss import CCEMicroDiceLossWithSoftmax
+from .cce_dice_loss import WeightedCCEDiceLossWithSoftmax

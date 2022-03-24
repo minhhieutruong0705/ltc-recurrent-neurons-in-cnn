@@ -44,17 +44,13 @@ class DiabeticRetinopathyDataset(Dataset):
         return len(self.data_instances)
 
     def __count_instances__(self):
-        instance_count = {}
-        for data_instance in self.data_instances:
-            if data_instance["label"] not in instance_count.keys():
-                instance_count.update({data_instance["label"]: 0})
-            instance_count[data_instance["label"]] += 1
-        return instance_count
+        labels = [data_instance["label"] for data_instance in self.data_instances]
+        return np.bincount(labels)
 
-    def get_reverse_class_weight(self):
+    def get_class_weight(self):
         instance_count = self.__count_instances__()
-        rev_weight = [instance_count[class_id] for class_id in sorted(instance_count.keys())]
-        return max(rev_weight) / np.array(rev_weight)
+        class_weight = instance_count.sum() / (len(instance_count) * instance_count)
+        return class_weight
 
     def __getitem__(self, index):
         image_path = os.path.join(self.image_dir, self.data_instances[index]["image_name"])
@@ -97,5 +93,5 @@ if __name__ == '__main__':
     transforms.ToPILImage()(image).show()
     print(label)
 
-    rev_class_weight = retino_train_dataset.get_reverse_class_weight()
+    rev_class_weight = retino_train_dataset.get_class_weight()
     print(rev_class_weight)
