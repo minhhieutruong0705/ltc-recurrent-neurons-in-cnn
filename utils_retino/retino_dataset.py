@@ -30,25 +30,21 @@ class DiabeticRetinopathyDataset(Dataset):
 
         # get images with their labels
         self.data_instances = read_list(data_list)
-        sorted_instances = self.__sort_instances__()  # sort instances
+        self.sorted_instances = self.__sort_instances__()  # sort instances
 
         # sub-sample class No-DR
-        instance_count = self.__count_instances__()
-        sub_sample_no_dr_size = instance_count[1:].sum()  # n_class0 = sum(n_class[1->4])
-        np.random.shuffle(sorted_instances[0])
-        self.data_instances = sorted_instances[0][:sub_sample_no_dr_size]
-        for i in range(1, len(instance_count)):
-            self.data_instances.extend(sorted_instances[i])
-        np.random.shuffle(self.data_instances)
+        self.instance_count = self.__count_instances__()
+        self.sorted_instances = self.__sub_sample__()
+        self.reset_flag = True
 
         # print data size
         print("[INFO] data size:", self.__len__())
         # print instance count of each class
         print("[INFO] data stats:")
-        instance_count = self.__count_instances__()
-        print(f"[INFO] {len(instance_count)} classes in total")
-        for class_id in range(len(instance_count)):
-            print(f"\t{int(class_id)}: {instance_count[class_id]}")
+        subsample_instance_count = self.__count_instances__()
+        print(f"[INFO] {len(subsample_instance_count)} classes in total")
+        for class_id in range(len(subsample_instance_count)):
+            print(f"\t{int(class_id)}: {subsample_instance_count[class_id]}")
 
     def __len__(self):
         return len(self.data_instances)
@@ -66,12 +62,25 @@ class DiabeticRetinopathyDataset(Dataset):
         labels = [data_instance["label"] for data_instance in self.data_instances]
         return np.bincount(labels)
 
+    def __sub_sample__(self):
+        print("[INFO] Subsample No DR!")
+        sub_sample_no_dr_size = self.instance_count[1:].sum()  # n_class0 = sum(n_class[1->4])
+        np.random.shuffle(self.sorted_instances[0])
+        subsample_data_instances = self.sorted_instances[0][:sub_sample_no_dr_size]
+        for i in range(1, len(self.instance_count)):
+            subsample_data_instances.extend(self.sorted_instances[i])
+        np.random.shuffle(subsample_data_instances)
+        return subsample_data_instances
+
     def get_class_weight(self):
         instance_count = self.__count_instances__()
         class_weight = instance_count.sum() / (len(instance_count) * instance_count)
         return class_weight
 
     def __getitem__(self, index):
+        if self.reset_flag:
+            self.__sub_sample__()
+            self.reset_flag = False
         image_path = os.path.join(self.image_dir, self.data_instances[index]["image_name"])
         image = np.array(Image.open(image_path).convert("RGB"))
         label = self.data_instances[index]["label"]
