@@ -36,7 +36,7 @@ class DiabeticRetinopathyDataset(Dataset):
         instance_count = self.__count_instances__()
         sub_sample_no_dr_size = instance_count[1:].sum()  # n_class0 = sum(n_class[1->4])
         np.random.shuffle(sorted_instances[0])
-        self.data_instances = [sorted_instances[0][:sub_sample_no_dr_size]]
+        self.data_instances = sorted_instances[0][:sub_sample_no_dr_size]
         for i in range(1, len(instance_count)):
             self.data_instances.extend(sorted_instances[i])
         np.random.shuffle(self.data_instances)
