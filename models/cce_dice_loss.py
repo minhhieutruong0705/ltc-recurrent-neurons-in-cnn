@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class WeightedCCEDiceLossWithSoftmax(nn.Module):
-    def __init__(self, class_weights, reduction="mean", cce_weight=0.6, dice_weight=1.0):
+    def __init__(self, class_weights, reduction="mean", cce_weight=1.0, dice_weight=0.5):
         super().__init__()
         self.class_weights = class_weights
         self.reduction = reduction
@@ -15,7 +15,10 @@ class WeightedCCEDiceLossWithSoftmax(nn.Module):
         assert predictions.size() == ground_truth.size()
         assert ground_truth.max() <= 1 and ground_truth.min() >= 0
 
-        prediction_category = predictions.argmax(dim=1)
+        # activation
+        predictions_softmax = predictions.softmax(dim=1)
+
+        prediction_category = predictions_softmax.argmax(dim=1)
         ground_truth_category = ground_truth.argmax(dim=1)
 
         # # micro dice loss
@@ -26,7 +29,7 @@ class WeightedCCEDiceLossWithSoftmax(nn.Module):
 
         # confusion matrix
         n_classes = len(self.class_weights)
-        confusion_matrix = torch.zeros(n_classes, n_classes)
+        confusion_matrix = torch.zeros((n_classes, n_classes)).cuda()
         for truth, prediction in zip(ground_truth_category, prediction_category):
             confusion_matrix[truth, prediction] += 1
         tp_classes = confusion_matrix.diag()
@@ -34,11 +37,9 @@ class WeightedCCEDiceLossWithSoftmax(nn.Module):
         fn_classes = confusion_matrix.sum(dim=1) - tp_classes
 
         # weighted dice loss
-        dice = tp_classes / (tp_classes + fp_classes + fn_classes)
-        dice_loss = ((1 - dice) * self.class_weights).sum()
-
-        # activation
-        predictions_softmax = predictions.softmax(dim=1)
+        esp = 1e-8
+        dice = (tp_classes + esp) / (tp_classes + fp_classes + fn_classes + esp)
+        dice_loss = ((1 - dice) * self.class_weights).mean()
 
         # cce loss
         cce_loss = F.cross_entropy(

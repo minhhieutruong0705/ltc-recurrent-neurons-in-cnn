@@ -37,7 +37,7 @@ class DiabeticRetinopathyDataset(Dataset):
         print("[INFO] data stats:")
         instance_count = self.__count_instances__()
         print(f"[INFO] {len(instance_count)} classes in total")
-        for class_id in sorted(instance_count.keys()):
+        for class_id in range(len(instance_count)):
             print(f"\t{int(class_id)}: {instance_count[class_id]}")
 
     def __len__(self):
