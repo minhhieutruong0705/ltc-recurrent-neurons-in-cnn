@@ -30,6 +30,16 @@ class DiabeticRetinopathyDataset(Dataset):
 
         # get images with their labels
         self.data_instances = read_list(data_list)
+        sorted_instances = self.__sort_instances__()  # sort instances
+
+        # sub-sample class No-DR
+        instance_count = self.__count_instances__()
+        sub_sample_no_dr_size = instance_count[1:].sum()  # n_class0 = sum(n_class[1->4])
+        np.random.shuffle(sorted_instances[0])
+        self.data_instances = [sorted_instances[0][:sub_sample_no_dr_size]]
+        for i in range(1, len(instance_count)):
+            self.data_instances.extend(sorted_instances[i])
+        np.random.shuffle(self.data_instances)
 
         # print data size
         print("[INFO] data size:", self.__len__())
@@ -42,6 +52,15 @@ class DiabeticRetinopathyDataset(Dataset):
 
     def __len__(self):
         return len(self.data_instances)
+
+    def __sort_instances__(self):
+        sorted_instances = {}
+        for data_instance in self.data_instances:
+            label_id = data_instance["label"]
+            if label_id not in sorted_instances.keys():
+                sorted_instances.update({label_id: []})
+            sorted_instances[label_id].append(data_instance)
+        return sorted_instances
 
     def __count_instances__(self):
         labels = [data_instance["label"] for data_instance in self.data_instances]
