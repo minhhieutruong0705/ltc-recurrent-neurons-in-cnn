@@ -40,7 +40,7 @@ def valid_test(log_file_dir, show_fig=False):
     with open(log_file, 'r') as f:
         test_result = f.readlines()[-1]  # last line in log file
     with open(stat_file_path, 'a+') as f:
-        f.write("\nTest result on best validated epoch (0.2*Accuracy + 0.3*F1_Score + 0.5*Dice_Score):")
+        f.write("\nTest result on best validated epoch:")
         f.write(f"\n{test_result}")
 
 

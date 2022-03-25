@@ -5,7 +5,7 @@ import torchinfo
 import os
 
 from models import CRNet_4FC
-from models import WeightedCCEDiceLossWithSoftmax
+from models import WeightedCCEFocalTverskyLossWithSoftmax
 from utils_retino import DiabeticRetinopathyTrainer
 from utils_retino import DiabeticRetinopathyValidator
 from utils_retino import DiabeticRetinopathyTester
@@ -21,11 +21,11 @@ if __name__ == '__main__':
     img_crop_dim = 224
 
     # train params
-    epochs = 400
+    epochs = 500
     batch_size = 64
-    data_load_workers = 3
+    data_load_workers = 6
     learning_rate = 1e-5
-    decay_rate = 1e-6
+    decay_rate = 1e-7
     scheduler_period = 10
     in_channels = 3
     class_names = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
@@ -106,13 +106,15 @@ if __name__ == '__main__':
         batch_size=batch_size,
         data_load_workers=data_load_workers
     )
+    cce_class_weight[0] = 0.2
     print("[INFO] Loss weighted:", cce_class_weight)
 
     # init
     model.apply(init_weights)
-    loss_function = WeightedCCEDiceLossWithSoftmax(
+    loss_function = WeightedCCEFocalTverskyLossWithSoftmax(
         class_weights=torch.tensor(cce_class_weight, device=device),
-        reduction=loss_reduction
+        reduction=loss_reduction,
+        device=device
     ).cuda()
     # loss_function = nn.MSELoss(reduction=loss_reduction).cuda()
     optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=decay_rate)
@@ -160,7 +162,7 @@ if __name__ == '__main__':
             checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_last.pth.tar"))
         )
         # save best checkpoint
-        score = accuracy * 0.2 + f1 * 0.3 + dice * 0.5
+        score = accuracy * 0.05 + f1 * 0.1 + dice * 0.85
         if score > best_score:
             best_score = score
             print(f"[INFO] New best scored obtained: {best_score:.2f}")
