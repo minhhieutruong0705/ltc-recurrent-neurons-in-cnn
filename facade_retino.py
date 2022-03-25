@@ -17,6 +17,7 @@ def get_data_loaders(
     train_dataset = DiabeticRetinopathyDataset(
         image_dir=train_dir,
         data_list=list_train,
+        sub_sample=True,
         transform=train_transformer
     )
     rev_class_weight = train_dataset.get_class_weight()
@@ -25,6 +26,7 @@ def get_data_loaders(
     val_dataset = DiabeticRetinopathyDataset(
         image_dir=train_dir,
         data_list=list_val,
+        sub_sample=False,
         transform=val_transformer
     )
 
@@ -32,6 +34,7 @@ def get_data_loaders(
     test_dataset = DiabeticRetinopathyDataset(
         image_dir=test_dir,
         data_list=list_test,
+        sub_sample=False,
         transform=val_transformer
     )
 

@@ -23,10 +23,11 @@ def read_list(path):
 
 
 class DiabeticRetinopathyDataset(Dataset):
-    def __init__(self, image_dir, data_list, transform=None):
+    def __init__(self, image_dir, data_list, sub_sample=False, transform=None):
         super().__init__()
         self.image_dir = image_dir
         self.transform = transform
+        self.sub_sample = sub_sample
 
         # get images with their labels
         self.data_instances = read_list(data_list)
@@ -34,7 +35,9 @@ class DiabeticRetinopathyDataset(Dataset):
 
         # sub-sample class No-DR
         self.instance_count = self.__count_instances__()
-        self.sorted_instances = self.__sub_sample__()
+        if self.sub_sample:
+            print("[INFO] Subsample No DR!")
+            self.data_instances = self.__sub_sample__()
         self.reset_flag = True
 
         # print data size
@@ -63,8 +66,7 @@ class DiabeticRetinopathyDataset(Dataset):
         return np.bincount(labels)
 
     def __sub_sample__(self):
-        print("[INFO] Subsample No DR!")
-        sub_sample_no_dr_size = self.instance_count[1:].sum()  # n_class0 = sum(n_class[1->4])
+        sub_sample_no_dr_size = self.instance_count[1:].max()  # n_class0 = max(n_class[1->4])
         np.random.shuffle(self.sorted_instances[0])
         subsample_data_instances = self.sorted_instances[0][:sub_sample_no_dr_size]
         for i in range(1, len(self.instance_count)):
@@ -78,7 +80,7 @@ class DiabeticRetinopathyDataset(Dataset):
         return class_weight
 
     def __getitem__(self, index):
-        if self.reset_flag:
+        if self.reset_flag and self.sub_sample:
             self.__sub_sample__()
             self.reset_flag = False
         image_path = os.path.join(self.image_dir, self.data_instances[index]["image_name"])
