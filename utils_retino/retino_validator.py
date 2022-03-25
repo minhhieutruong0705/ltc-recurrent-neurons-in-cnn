@@ -36,8 +36,8 @@ class DiabeticRetinopathyValidator():
                 total_prediction_category.extend(prediction_category.detach().cpu().numpy())
                 total_ground_truth_category.extend(ground_truth_category.detach().cpu().numpy())
 
-            loop.set_postfix(loss=loss.item())
-            total_eval_loss += loss.item()
+                loop.set_postfix(loss=loss.item())
+                total_eval_loss += loss.item()
 
         assert len(total_prediction_category) == len(total_ground_truth_category)
 
@@ -58,7 +58,7 @@ class DiabeticRetinopathyValidator():
 
         # macro dice for positive classes
         dice_classes = tp_classes / (tp_classes + fp_classes + fn_classes)
-        dice = np.average(dice_classes) * 100
+        dice = np.average(dice_classes[1:]) * 100
 
         # confusion considering class 0 is negative and others are positive
         tp = tp_classes[1:].sum()
