@@ -12,7 +12,7 @@ def track_training(data_dict, training_name, **plt_kwarg):
 
     # plot train & valid loss
     plot_fig(fig_name=f"{training_name}_train-val_loss", x=x,
-             ys=[data_dict["[TRAIN]"]["Loss"], data_dict["VALID"]["Loss"]],
+             ys=[data_dict["[TRAIN]"]["Loss"], data_dict["[VALID]"]["Loss"]],
              y_names=["train loss", "validation loss"], bound_value=0, **plt_kwarg)
 
     # plot train & valid accuracy & dice
