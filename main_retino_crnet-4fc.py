@@ -24,8 +24,7 @@ if __name__ == '__main__':
     epochs = 500
     batch_size = 64
     data_load_workers = 6
-    learning_rate = 1e-5
-    decay_rate = 1e-7
+    learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
     class_names = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
@@ -120,7 +119,7 @@ if __name__ == '__main__':
     #     device=device
     # ).cuda()
     # loss_function = nn.MSELoss(reduction=loss_reduction).cuda()
-    optimizer = optim.AdamW(model.parameters(), lr=learning_rate, weight_decay=decay_rate)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=scheduler_period)
     scaler = torch.cuda.amp.GradScaler()
 

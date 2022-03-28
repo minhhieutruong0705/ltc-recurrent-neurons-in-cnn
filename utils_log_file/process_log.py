@@ -10,15 +10,12 @@ def track_training(data_dict, training_name, **plt_kwarg):
     x = range(n_epochs)  # scatter x based on number of epochs
     print(f"[INFO] Training of {training_name} is at {n_epochs} epochs!")
 
-    # plot train loss
-    plot_fig(fig_name=f"{training_name}_train_loss", x=x,
-             ys=[data_dict["[TRAIN]"]["Loss"]], y_names=["train loss"], bound_value=0, **plt_kwarg)
+    # plot train & valid loss
+    plot_fig(fig_name=f"{training_name}_train-val_loss", x=x,
+             ys=[data_dict["[TRAIN]"]["Loss"], data_dict["VALID"]["Loss"]],
+             y_names=["train loss", "validation loss"], bound_value=0, **plt_kwarg)
 
-    # plot validation loss
-    plot_fig(fig_name=f"{training_name}_validation_loss", x=x,
-             ys=[data_dict["[VALID]"]["Loss"]], y_names=["validation loss"], bound_value=0, **plt_kwarg)
-
-    # plot train & eval accuracy & dice
+    # plot train & valid accuracy & dice
     plot_fig(fig_name=f"{training_name}_train-val_metrics", x=x,
              ys=[data_dict["[TRAIN]"]["Acc"], data_dict["[VALID]"]["Acc"],
                  data_dict["[TRAIN]"]["F1"], data_dict["[VALID]"]["F1"],
