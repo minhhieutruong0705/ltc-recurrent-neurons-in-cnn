@@ -23,7 +23,7 @@ def read_list(path):
 
 
 class DiabeticRetinopathyDataset(Dataset):
-    def __init__(self, image_dir, data_list, sub_sample=False, transform=None):
+    def __init__(self, image_dir, data_list, data_balance=False, transform=None):
         super().__init__()
         self.image_dir = image_dir
         self.transform = transform
@@ -32,19 +32,14 @@ class DiabeticRetinopathyDataset(Dataset):
         self.data_instances = read_list(data_list)
         self.sorted_instances = self.__sort_instances__()  # sort instances
 
+        print("[INFO] Dataset stats")
+        self.__print_dataset_stats()
+
         # sub-sample class No-DR
         self.instance_count = self.__count_instances__()
-        if sub_sample:
-            self.data_instances = self.__sub_sample__()
-
-        # print data size
-        print("[INFO] data size:", self.__len__())
-        # print instance count of each class
-        print("[INFO] data stats:")
-        subsample_instance_count = self.__count_instances__()
-        print(f"[INFO] {len(subsample_instance_count)} classes in total")
-        for class_id in range(len(subsample_instance_count)):
-            print(f"\t{int(class_id)}: {subsample_instance_count[class_id]}")
+        if data_balance:
+            self.data_instances = self.__balance_dataset__()
+            self.__print_dataset_stats()
 
     def __len__(self):
         return len(self.data_instances)
@@ -62,13 +57,26 @@ class DiabeticRetinopathyDataset(Dataset):
         labels = [data_instance["label"] for data_instance in self.data_instances]
         return np.bincount(labels)
 
-    def __sub_sample__(self):
-        print("[INFO] Subsample No DR!")
-        sub_sample_no_dr_size = self.instance_count[1:].max()  # n_class0 = max(n_class[1->4])
-        np.random.shuffle(self.sorted_instances[0])  # shuffle No-DR
-        subsample_data_instances = self.sorted_instances[0][:sub_sample_no_dr_size]
-        for i in range(1, len(self.instance_count)):
-            subsample_data_instances.extend(self.sorted_instances[i])
+    def __print_dataset_stats(self):
+        # print data size
+        print("[INFO] Data size:", self.__len__())
+        # print instance count of each class
+        print("[INFO] Data stats:")
+        subsample_instance_count = self.__count_instances__()
+        print(f"[INFO] {len(subsample_instance_count)} classes in total")
+        for class_id in range(len(subsample_instance_count)):
+            print(f"\t{int(class_id)}: {subsample_instance_count[class_id]}")
+
+    def __balance_dataset__(self):
+        print("[INFO] Balancing dataset")
+        sub_sample_size = self.instance_count.max()  # largest class
+        subsample_data_instances = []
+        for i in range(len(self.instance_count)):
+            class_i_instances = self.sorted_instances[i]
+            np.random.shuffle(class_i_instances)  # shuffle
+            class_i_instances = class_i_instances * int(sub_sample_size / len(class_i_instances))  # replicate instances
+            class_i_instances.extend(class_i_instances[:(sub_sample_size - len(class_i_instances))])  # fill up
+            subsample_data_instances.extend(class_i_instances)
         np.random.shuffle(subsample_data_instances)
         return subsample_data_instances
 
@@ -108,12 +116,9 @@ if __name__ == '__main__':
         ), ToTensorV2()
     ])
 
-    retino_train_dataset = DiabeticRetinopathyDataset(
-        image_dir="../../datasets/Dataset_DiabeticRetinopathy/train",
-        data_list="../../datasets/Dataset_DiabeticRetinopathy/trainLabels.csv",
-        sub_sample=True,
-        transform=train_transformer
-    )
+    retino_train_dataset = DiabeticRetinopathyDataset(image_dir="../../datasets/Dataset_DiabeticRetinopathy/train",
+                                                      data_list="../../datasets/Dataset_DiabeticRetinopathy/trainLabels.csv",
+                                                      data_balance=True, transform=train_transformer)
 
     image, label = retino_train_dataset.__getitem__(6)
     transforms.ToPILImage()(image).show()

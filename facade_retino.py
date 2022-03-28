@@ -14,29 +14,17 @@ def get_data_loaders(
         batch_size, data_load_workers
 ):
     print("[INFO] Loading train dataset ...")
-    train_dataset = DiabeticRetinopathyDataset(
-        image_dir=train_dir,
-        data_list=list_train,
-        sub_sample=True,
-        transform=train_transformer
-    )
-    rev_class_weight = train_dataset.get_class_weight()
+    train_dataset = DiabeticRetinopathyDataset(image_dir=train_dir, data_list=list_train, data_balance=True,
+                                               transform=train_transformer)
+    class_weight = train_dataset.get_class_weight()
 
     print("[INFO] Loading validation dataset ...")
-    val_dataset = DiabeticRetinopathyDataset(
-        image_dir=train_dir,
-        data_list=list_val,
-        sub_sample=False,
-        transform=val_transformer
-    )
+    val_dataset = DiabeticRetinopathyDataset(image_dir=train_dir, data_list=list_val, data_balance=False,
+                                             transform=val_transformer)
 
     print("[INFO] Loading test dataset ...")
-    test_dataset = DiabeticRetinopathyDataset(
-        image_dir=test_dir,
-        data_list=list_test,
-        sub_sample=False,
-        transform=val_transformer
-    )
+    test_dataset = DiabeticRetinopathyDataset(image_dir=test_dir, data_list=list_test, data_balance=False,
+                                              transform=val_transformer)
 
     train_loader = DataLoader(
         dataset=train_dataset,
@@ -58,7 +46,7 @@ def get_data_loaders(
         shuffle=False,
         num_workers=data_load_workers
     )
-    return train_loader, val_loader, test_loader, rev_class_weight
+    return train_loader, val_loader, test_loader, class_weight
 
 
 # transformer is for the augmentation of data
