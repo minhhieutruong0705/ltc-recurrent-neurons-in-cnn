@@ -68,7 +68,7 @@ class DiabeticRetinopathyTrainer():
 
         # macro dice for positive classes
         dice_classes = tp_classes / (tp_classes + fp_classes + fn_classes)
-        dice = np.average(dice_classes[1:]) * 100
+        dice = np.average(dice_classes) * 100
 
         # confusion considering class 0 is negative and others are positive
         tp = tp_classes[1:].sum()

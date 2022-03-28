@@ -45,8 +45,8 @@ class DiabeticRetinopathyValidator():
         accuracy = accuracy_score(total_ground_truth_category, total_prediction_category) * 100
 
         # calculate precision, recall, anf f1 score (macro)
-        precision = precision_score(total_ground_truth_category, total_prediction_category, average="macro")
-        recall = recall_score(total_ground_truth_category, total_prediction_category, average="macro")
+        precision = precision_score(total_ground_truth_category, total_prediction_category, average="macro") * 100
+        recall = recall_score(total_ground_truth_category, total_prediction_category, average="macro") * 100
         f1 = f1_score(total_ground_truth_category, total_prediction_category, average="macro") * 100
 
         # confusion matrix for each class
@@ -58,7 +58,7 @@ class DiabeticRetinopathyValidator():
 
         # macro dice for positive classes
         dice_classes = tp_classes / (tp_classes + fp_classes + fn_classes)
-        dice = np.average(dice_classes[1:]) * 100
+        dice = np.average(dice_classes) * 100
 
         # confusion considering class 0 is negative and others are positive
         tp = tp_classes[1:].sum()

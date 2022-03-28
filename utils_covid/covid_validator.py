@@ -33,8 +33,8 @@ class CovidValidator():
                 fp += (prediction_no_grad * (1 - ground_truth_no_grad).abs()).sum()
                 fn += ((1 - prediction_no_grad).abs() * ground_truth_no_grad).sum()
 
-            loop.set_postfix(loss=loss.item())
-            total_eval_loss += loss.item()
+                loop.set_postfix(loss=loss.item())
+                total_eval_loss += loss.item()
 
         precision = tp / (tp + fp)
         recall = tp / (tp + fn)

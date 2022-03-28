@@ -165,7 +165,7 @@ if __name__ == '__main__':
             checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_last.pth.tar"))
         )
         # save best checkpoint
-        score = accuracy * 0.1 + f1 * 0.2 + dice * 0.7
+        score = accuracy * 1.0 + f1 * 0.0 + dice * 0.0
         if score > best_score:
             best_score = score
             print(f"[INFO] New best scored obtained: {best_score:.2f}")
