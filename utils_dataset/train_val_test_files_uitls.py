@@ -44,10 +44,10 @@ def split_csv_train_file(train_file_path_ori, train_file_path, val_file_path):
     with open(train_file_path, 'w') as f:
         csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
         csv_writer.writeheader()
-        csv_writer.writerows(lines[:int(0.65 * file_length)])
+        csv_writer.writerows(lines[:int(0.75 * file_length)])
 
     # create valid.txt
     with open(val_file_path, 'w') as f:
         csv_writer = csv.DictWriter(f, fieldnames=fieldnames)
         csv_writer.writeheader()
-        csv_writer.writerows(lines[int(0.65 * file_length):])
+        csv_writer.writerows(lines[int(0.75 * file_length):])

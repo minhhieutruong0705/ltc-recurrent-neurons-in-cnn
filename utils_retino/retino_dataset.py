@@ -27,7 +27,6 @@ class DiabeticRetinopathyDataset(Dataset):
         super().__init__()
         self.image_dir = image_dir
         self.transform = transform
-        self.sub_sample = sub_sample
 
         # get images with their labels
         self.data_instances = read_list(data_list)
@@ -35,10 +34,8 @@ class DiabeticRetinopathyDataset(Dataset):
 
         # sub-sample class No-DR
         self.instance_count = self.__count_instances__()
-        if self.sub_sample:
-            print("[INFO] Subsample No DR!")
+        if sub_sample:
             self.data_instances = self.__sub_sample__()
-        self.reset_flag = True
 
         # print data size
         print("[INFO] data size:", self.__len__())
@@ -66,8 +63,9 @@ class DiabeticRetinopathyDataset(Dataset):
         return np.bincount(labels)
 
     def __sub_sample__(self):
+        print("[INFO] Subsample No DR!")
         sub_sample_no_dr_size = self.instance_count[1:].max()  # n_class0 = max(n_class[1->4])
-        np.random.shuffle(self.sorted_instances[0])
+        np.random.shuffle(self.sorted_instances[0])  # shuffle No-DR
         subsample_data_instances = self.sorted_instances[0][:sub_sample_no_dr_size]
         for i in range(1, len(self.instance_count)):
             subsample_data_instances.extend(self.sorted_instances[i])
@@ -80,9 +78,6 @@ class DiabeticRetinopathyDataset(Dataset):
         return class_weight
 
     def __getitem__(self, index):
-        if self.reset_flag and self.sub_sample:
-            self.__sub_sample__()
-            self.reset_flag = False
         image_path = os.path.join(self.image_dir, self.data_instances[index]["image_name"])
         image = np.array(Image.open(image_path).convert("RGB"))
         label = self.data_instances[index]["label"]
@@ -116,6 +111,7 @@ if __name__ == '__main__':
     retino_train_dataset = DiabeticRetinopathyDataset(
         image_dir="../../datasets/Dataset_DiabeticRetinopathy/train",
         data_list="../../datasets/Dataset_DiabeticRetinopathy/trainLabels.csv",
+        sub_sample=True,
         transform=train_transformer
     )
 
@@ -123,5 +119,5 @@ if __name__ == '__main__':
     transforms.ToPILImage()(image).show()
     print(label)
 
-    rev_class_weight = retino_train_dataset.get_class_weight()
-    print(rev_class_weight)
+    class_weight = retino_train_dataset.get_class_weight()
+    print(class_weight)

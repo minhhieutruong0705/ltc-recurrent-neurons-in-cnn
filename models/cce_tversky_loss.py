@@ -48,11 +48,11 @@ class WeightedCCEFocalTverskyLossWithSoftmax(nn.Module):
                   (tp_classes + fp_classes * self.tversky_beta + fn_classes * self.tversky_alpha + esp)
         focal_tversky_loss = torch.pow((1 - tversky), self.focal_gamma)
         weighted_focal_tversky_loss = (focal_tversky_loss * self.class_weights).sum() / \
-                                      self.class_weights[ground_truth_category].sum()
+                                      self.class_weights[ground_truth_category].sum()  # mean reduction
 
         # cce loss
         weighted_cce_loss = F.cross_entropy(
-            input=predictions_softmax,
+            input=predictions,  # activation included in the criterion
             target=ground_truth,
             reduction=self.reduction,
             weight=self.class_weights
@@ -64,7 +64,7 @@ class WeightedCCEFocalTverskyLossWithSoftmax(nn.Module):
 
 if __name__ == '__main__':
     x = torch.randn(16, 5)
-    y = torch.randint(0, 1, (16, 5)).float()
+    y = torch.randint(0, 2, (16, 5)).float()
     weight = torch.randn(5)
     loss_fn = WeightedCCEFocalTverskyLossWithSoftmax(class_weights=weight, device="cpu")
     loss = loss_fn(x, y)
