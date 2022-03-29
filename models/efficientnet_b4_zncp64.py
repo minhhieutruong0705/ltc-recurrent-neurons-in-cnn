@@ -10,11 +10,18 @@ class EfficientNet_B4ZNCP64(nn.Module):
     def __init__(self, classes=5, pretrain=True):
         super().__init__()
         self.efficientnet_b4 = models.efficientnet_b4(pretrained=pretrain)
-        self.efficientnet_b4.avgpool = nn.AdaptiveAvgPool2d(output_size=8)
+        self.efficientnet_b4.avgpool = nn.Sequential(
+            nn.Conv2d(
+                in_channels=1792, out_channels=224,
+                kernel_size=(1, 1), stride=1, bias=False
+            ),
+            nn.BatchNorm2d(num_features=224),
+            nn.AdaptiveAvgPool2d(output_size=8)
+        )
         self.efficientnet_b4.classifier = nn.Sequential(
             nn.Dropout(p=0.5, inplace=True),
             NCP_FC(
-                seq_len=1792,
+                seq_len=224,
                 classes=classes,
                 bi_directional=False,
                 sensory_neurons=64,
