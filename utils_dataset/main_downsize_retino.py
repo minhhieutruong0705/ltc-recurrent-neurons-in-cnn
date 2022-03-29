@@ -6,7 +6,7 @@ from image_utils import crop_by_ratio
 """
 Images of Diabetic Retinopathy are varying in spatial size. They also have the dark area surrounding the retina,
 especially on the left and right of an image. To reduce the uninformative area, the images are first cropped. Then,
-they are resized to a smaller scale of 512x512
+they are resized to a smaller scale of 600x600
 """
 
 
