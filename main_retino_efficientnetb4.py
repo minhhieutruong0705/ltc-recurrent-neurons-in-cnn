@@ -17,12 +17,12 @@ if __name__ == '__main__':
     shuffler_version = 1
 
     # image params
-    img_dim = 380
+    img_dim = 384
     img_crop_dim = 380
 
     # train params
     epochs = 500
-    batch_size = 64
+    batch_size = 16
     data_load_workers = 6
     learning_rate = 1e-4
     scheduler_period = 10

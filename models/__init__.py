@@ -15,3 +15,4 @@ from .cce_loss import WeightedCCELoss
 from .bce_dice_loss import BCEDiceLossWithLogistic
 from .cce_tversky_loss import WeightedCCEFocalTverskyLossWithSoftmax
 from .efficientnet_b4 import EfficientNet_B4
+from .efficientnet_b4_zncp64 import EfficientNet_B4ZNCP64

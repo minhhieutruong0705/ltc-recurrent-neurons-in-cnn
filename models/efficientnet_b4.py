@@ -18,7 +18,7 @@ class EfficientNet_B4(nn.Module):
 
 
 if __name__ == '__main__':
-    image_size = 528
+    image_size = 380
     x = torch.randn(8, 3, image_size, image_size)
     model = EfficientNet_B4()
     y = model(x)
