@@ -69,14 +69,15 @@ class DiabeticRetinopathyDataset(Dataset):
 
     def __balance_dataset__(self):
         print("[INFO] Balancing dataset")
-        sub_sample_size = self.instance_count.max()  # largest class
+        # sub_sample_size = self.instance_count.max()  # largest class
+        sub_sample_size = self.instance_count[1:].sum()  # No-DR is too large
         subsample_data_instances = []
         for i in range(len(self.instance_count)):
             class_i_instances = self.sorted_instances[i]
             np.random.shuffle(class_i_instances)  # shuffle
-            class_i_instances = class_i_instances * int(sub_sample_size / len(class_i_instances))  # replicate instances
-            class_i_instances.extend(class_i_instances[:(sub_sample_size - len(class_i_instances))])  # fill up
-            subsample_data_instances.extend(class_i_instances)
+            class_i_balance = class_i_instances.copy() * int(sub_sample_size / len(class_i_instances))  # replicate
+            class_i_balance.extend(class_i_instances[:(sub_sample_size - len(class_i_balance))])  # fill up
+            subsample_data_instances.extend(class_i_balance)
         np.random.shuffle(subsample_data_instances)
         return subsample_data_instances
 
