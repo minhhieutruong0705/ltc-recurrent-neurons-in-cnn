@@ -14,4 +14,4 @@ from .crnet_ncp_xyrnn import CRNetNCP_XYRNN
 from .cce_loss import WeightedCCELoss
 from .bce_dice_loss import BCEDiceLossWithLogistic
 from .cce_tversky_loss import WeightedCCEFocalTverskyLossWithSoftmax
-from .efficientnet_b6 import EfficientNet_B6
+from .efficientnet_b4 import EfficientNet_B4

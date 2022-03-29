@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import EfficientNet_B6
+from models import EfficientNet_B4
 from models import WeightedCCELoss
 from utils_retino import DiabeticRetinopathyTrainer
 from utils_retino import DiabeticRetinopathyValidator
@@ -13,12 +13,12 @@ from facade_retino import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint, draw_confusion_matrix
 
 if __name__ == '__main__':
-    training_name = "retino_efficientnet-b6"
+    training_name = "retino_efficientnet-b4"
     shuffler_version = 1
 
     # image params
-    img_dim = 528
-    img_crop_dim = 528
+    img_dim = 380
+    img_crop_dim = 380
 
     # train params
     epochs = 500
@@ -32,7 +32,7 @@ if __name__ == '__main__':
 
     # models
     pretrain = True
-    model = EfficientNet_B6(classes=classes, pretrain=pretrain).cuda()
+    model = EfficientNet_B4(classes=classes, pretrain=pretrain).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
