@@ -63,9 +63,9 @@ def get_transformers(
         max_pixel_value,
 ):
     train_transformer = A.Compose([
-        A.Resize(height=img_dim, width=img_dim, interpolation=cv2.INTER_AREA),
+        A.Resize(height=img_dim, width=img_dim, interpolation=cv2.INTER_CUBIC),
         A.RandomResizedCrop(height=img_crop_dim, width=img_crop_dim, scale=(random_crop_scale, 1.0),
-                            interpolation=cv2.INTER_AREA),
+                            interpolation=cv2.INTER_CUBIC),
         A.HorizontalFlip(),
         A.Rotate(limit=rotation_limit),
         A.GaussNoise(),
