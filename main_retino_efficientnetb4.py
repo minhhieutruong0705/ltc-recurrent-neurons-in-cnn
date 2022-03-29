@@ -24,7 +24,7 @@ if __name__ == '__main__':
     epochs = 175
     batch_size = 16
     data_load_workers = 6
-    learning_rate = 1e-4
+    learning_rate = 1e-5
     scheduler_period = 10
     in_channels = 3
     class_names = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
@@ -59,7 +59,7 @@ if __name__ == '__main__':
         f.write(str(model_summary))
 
     # augmentation params
-    random_crop_scale = 0.8
+    random_crop_scale = 0.95
     rotation_limit = 15
     blur_kernel_range = (3, 7)
     mean_norm = [0.485, 0.456, 0.406]

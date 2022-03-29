@@ -12,16 +12,16 @@ class EfficientNet_B4ZNCP64(nn.Module):
         self.efficientnet_b4 = models.efficientnet_b4(pretrained=pretrain)
         self.efficientnet_b4.avgpool = nn.Sequential(
             nn.Conv2d(
-                in_channels=1792, out_channels=112,
+                in_channels=1792, out_channels=56,
                 kernel_size=(1, 1), stride=1, bias=False
             ),
-            nn.BatchNorm2d(num_features=112),
+            nn.BatchNorm2d(num_features=56),
             nn.AdaptiveAvgPool2d(output_size=8)
         )
         self.efficientnet_b4.classifier = nn.Sequential(
             nn.Dropout(p=0.5, inplace=True),
             NCP_FC(
-                seq_len=112,
+                seq_len=56,
                 classes=classes,
                 bi_directional=False,
                 sensory_neurons=64,

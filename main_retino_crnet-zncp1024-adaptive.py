@@ -73,7 +73,7 @@ if __name__ == '__main__':
         f.write(str(model_summary))
 
     # augmentation params
-    random_crop_scale = 0.8
+    random_crop_scale = 0.95
     rotation_limit = 15
     blur_kernel_range = (3, 7)
     mean_norm = [0.0, 0.0, 0.0]

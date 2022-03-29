@@ -70,7 +70,7 @@ class DiabeticRetinopathyDataset(Dataset):
     def __balance_dataset__(self):
         print("[INFO] Balancing dataset")
         # sub_sample_size = self.instance_count.max()  # largest class
-        sub_sample_size = self.instance_count[1:].sum()  # No-DR is too large
+        sub_sample_size = self.instance_count[1:].max()  # No-DR is too large
         subsample_data_instances = []
         for i in range(len(self.instance_count)):
             class_i_instances = self.sorted_instances[i]
