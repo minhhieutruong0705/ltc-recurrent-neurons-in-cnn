@@ -34,7 +34,7 @@ if __name__ == '__main__':
     # params
     crop_ratio_h = 1.0
     crop_ratio_w = 0.9
-    resize_dim_h = resize_dim_w = 512
+    resize_dim_h = resize_dim_w = 600
 
     # process train images
     for img_name in tqdm(os.listdir(train_img_dir)):
