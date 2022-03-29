@@ -13,7 +13,7 @@ from facade_retino import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint, draw_confusion_matrix
 
 if __name__ == '__main__':
-    training_name = "retino_efficientnet-b4"
+    training_name = "retino_efficientnet-b4-zncp64"
     shuffler_version = 1
 
     # image params
