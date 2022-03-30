@@ -24,7 +24,7 @@ if __name__ == '__main__':
     epochs = 175
     batch_size = 16
     data_load_workers = 6
-    learning_rate = 1e-5
+    learning_rate = 1e-3
     scheduler_period = 10
     in_channels = 3
     class_names = ["No DR", "Mild", "Moderate", "Severe", "Proliferative DR"]
@@ -165,14 +165,15 @@ if __name__ == '__main__':
             checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_last.pth.tar"))
         )
         # save best checkpoint
-        score = accuracy * 1.0 + f1 * 0.0 + dice * 0.0
-        if score > best_score:
-            best_score = score
-            print(f"[INFO] New best scored obtained: {best_score:.2f}")
-            save_checkpoint(
-                state=checkpoint,
-                checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
-            )
+        if i > (epochs // 2):  # start recording when trained with half of epochs
+            score = accuracy * 1.0 + f1 * 0.0 + dice * 0.0
+            if score > best_score:
+                best_score = score
+                print(f"[INFO] New best scored obtained: {best_score:.2f}")
+                save_checkpoint(
+                    state=checkpoint,
+                    checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
+                )
 
     # tester
     retino_tester = DiabeticRetinopathyTester(
