@@ -12,7 +12,7 @@ def get_data_loaders(
         list_train_covid, list_train_non_covid, train_transformer,
         list_val_covid, list_val_non_covid, val_transformer,
         list_test_covid, list_test_non_covid,
-        batch_size, lung_mask_incor
+        batch_size, lung_mask_incor, data_workers=0
 ):
     print("[INFO] Loading train dataset ...")
     train_dataset = CovidDataset(
@@ -47,19 +47,22 @@ def get_data_loaders(
     train_loader = DataLoader(
         dataset=train_dataset,
         batch_size=batch_size,
-        shuffle=True
+        shuffle=True,
+        num_workers=data_workers
     )
 
     val_loader = DataLoader(
         dataset=val_dataset,
         batch_size=batch_size,
-        shuffle=False
+        shuffle=False,
+        num_workers=data_workers
     )
 
     test_loader = DataLoader(
         dataset=test_dataset,
         batch_size=batch_size,
-        shuffle=False
+        shuffle=False,
+        num_workers=data_workers
     )
     return train_loader, val_loader, test_loader
 

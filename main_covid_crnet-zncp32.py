@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchinfo
 import os
+import time
 
 from models import CRNetNCP_ZRNN
 from models import BCEDiceLossWithLogistic
@@ -13,7 +14,7 @@ from facade_train import init_weights, log_to_file, save_checkpoint, load_checkp
 
 if __name__ == '__main__':
     training_name = "covid_crnet-zncp32"
-    shuffler_version = 1
+    shuffler_version = 6
 
     # image params
     img_dim = 256
@@ -23,6 +24,7 @@ if __name__ == '__main__':
     # train params
     epochs = 175
     batch_size = 64
+    data_workers = 6
     learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3 if not lung_mask_incor else 4
@@ -107,7 +109,8 @@ if __name__ == '__main__':
         batch_size=batch_size,
         train_transformer=train_transformer,
         val_transformer=val_transformer,
-        lung_mask_incor=lung_mask_incor
+        lung_mask_incor=lung_mask_incor,
+        data_workers=data_workers
     )
 
     # init
@@ -139,6 +142,7 @@ if __name__ == '__main__':
 
     # train & eval
     best_score = -1
+    start_time = time.time()
     for i in range(epochs):
         print(f"\n[INFO] {i + 1}/{epochs} epochs")
         # train
@@ -167,6 +171,17 @@ if __name__ == '__main__':
                 state=checkpoint,
                 checkpoint_file=os.path.join(checkpoints_dir, checkpoint_name.replace(".pth.tar", "_best.pth.tar"))
             )
+    end_time = time.time()
+
+    # process training time
+    training_time = int(end_time - start_time)
+    minutes, seconds = divmod(training_time, 60)
+    hours, minutes = divmod(minutes, 60)
+
+    # record training time
+    with open(model_summary_file, 'w') as f:
+        f.write('\n\n')
+        f.write(f"Training Time: {hours}h {minutes}m {seconds}s")
 
     # tester
     covid_tester = CovidValidator(
