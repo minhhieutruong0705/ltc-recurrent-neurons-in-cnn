@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNetNCP_YRNN
+from models import CRNetNCP_ZRNN
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-yncp1024ada"
+    training_name = "covid_crnet-zncp1024ada"
     shuffler_version = 1
 
     # image params
@@ -29,10 +29,10 @@ if __name__ == '__main__':
 
     # models
     bi_directional = False
-    model = CRNetNCP_YRNN(  # custom version of crnet-yncp (adaptive sensory neurons: 16*128 -> 1024)
+    model = CRNetNCP_ZRNN(  # custom version of crnet-zncp (adaptive sensory neurons: 16*16 -> 1024)
         in_channels=in_channels,
-        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (H x W): (27 x 27) -> (16 x 16)
-        ncp_feature_shrink=128,  # number of information in z: 128 -> 128 (double conv)
+        ncp_spatial_dim=16,  # RNN features: 16*16=256 < 1024; adaptive enhance number of features
+        ncp_feature_seq=16,  # RNN data sequence: 16
         adaptive_ncp_sensory=1024,
         inter_neurons=192,
         command_neurons=48,
@@ -85,8 +85,8 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path for images
-    covid_dir = "../../datasets/Dataset_Covid/COVID"
-    non_covid_dir = "../../datasets/Dataset_Covid/NONCOVID"
+    covid_dir = "../datasets/Dataset_Covid/COVID"
+    non_covid_dir = "../datasets/Dataset_Covid/NONCOVID"
 
     # path for train, validation, and test sets
     train_covid_file = f"records/covid_{shuffler_version}/covid_train_{shuffler_version}.txt"

@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNet_4FC
+from models import EfficientNet_B4ZNCP64
 from models import WeightedCCELoss
 from utils_retino import DiabeticRetinopathyTrainer
 from utils_retino import DiabeticRetinopathyValidator
@@ -13,17 +13,17 @@ from facade_retino import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint, draw_confusion_matrix
 
 if __name__ == '__main__':
-    training_name = "retino_crnet-4fc"
-    shuffler_version = 1
+    training_name = "retino_efficientnet-b4-zncp64"
+    shuffler_version = 2
 
     # image params
-    img_dim = 256
-    img_crop_dim = 224
+    img_dim = 384
+    img_crop_dim = 380
 
     # train params
     epochs = 175
     batch_size = 16
-    data_load_workers = 6
+    data_workers = 6
     learning_rate = 1e-4
     scheduler_period = 10
     in_channels = 3
@@ -31,7 +31,8 @@ if __name__ == '__main__':
     classes = len(class_names)
 
     # models
-    model = CRNet_4FC(in_channels=in_channels, classes=classes).cuda()
+    pretrain = True
+    model = EfficientNet_B4ZNCP64(classes=classes, pretrain=pretrain).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
@@ -61,8 +62,8 @@ if __name__ == '__main__':
     random_crop_scale = 0.95
     rotation_limit = 15
     blur_kernel_range = (3, 7)
-    mean_norm = [0.0, 0.0, 0.0]
-    std_norm = [1.0, 1.0, 1.0]
+    mean_norm = [0.485, 0.456, 0.406]
+    std_norm = [0.229, 0.224, 0.225]
     max_pixel_value = 255.0
     contrast_factor = brightness_factor = 0.2
 
@@ -103,7 +104,7 @@ if __name__ == '__main__':
         train_transformer=train_transformer,
         val_transformer=val_transformer,
         batch_size=batch_size,
-        data_load_workers=data_load_workers
+        data_workers=data_workers
     )
     print("[INFO] Loss weighted:", cce_class_weight)
 

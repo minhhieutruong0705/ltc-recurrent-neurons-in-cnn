@@ -4,7 +4,7 @@ import torch.optim as optim
 import torchinfo
 import os
 
-from models import CRNetNCP_YRNN
+from models import CRNet
 from models import BCEDiceLossWithLogistic
 from utils_covid import CovidTrainer
 from utils_covid import CovidValidator
@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-yncp1024"
+    training_name = "covid_crnet-1fc"
     shuffler_version = 1
 
     # image params
@@ -28,21 +28,7 @@ if __name__ == '__main__':
     in_channels = 3 if not lung_mask_incor else 4
 
     # models
-    bi_directional = False
-    model = CRNetNCP_YRNN(  # custom version of crnet-yncp (sensory neurons: 16*64 = 1024)
-        in_channels=in_channels,
-        ncp_spatial_dim=16,  # RNN sequence: 16; last global average pooling (H x W): (27 x 27) -> (16 x 16)
-        ncp_feature_shrink=64,  # number of information in z: 128 -> 64
-        adaptive_ncp_sensory=None,  # sensory neurons: ncp_spatial_dim*ncp_feature_shrink
-        inter_neurons=192,
-        command_neurons=48,
-        motor_neurons=4,
-        sensory_outs=96,
-        inter_outs=32,
-        recurrent_dense=48,
-        motor_ins=48,
-        bi_directional=bi_directional
-    ).cuda()  # ncp: 16*64 -> 192 -> 48 -> 4; classification: 16*4 -> 2
+    model = CRNet(in_channels=in_channels).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
@@ -85,8 +71,8 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path for images
-    covid_dir = "../../datasets/Dataset_Covid/COVID"
-    non_covid_dir = "../../datasets/Dataset_Covid/NONCOVID"
+    covid_dir = "../datasets/Dataset_Covid/COVID"
+    non_covid_dir = "../datasets/Dataset_Covid/NONCOVID"
 
     # path for train, validation, and test sets
     train_covid_file = f"records/covid_{shuffler_version}/covid_train_{shuffler_version}.txt"

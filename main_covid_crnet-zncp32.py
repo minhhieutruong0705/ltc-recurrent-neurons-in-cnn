@@ -12,7 +12,7 @@ from facade_covid import get_transformers, get_data_loaders
 from facade_train import init_weights, log_to_file, save_checkpoint, load_checkpoint
 
 if __name__ == '__main__':
-    training_name = "covid_crnet-zncp1024ada"
+    training_name = "covid_crnet-zncp32"
     shuffler_version = 1
 
     # image params
@@ -29,20 +29,7 @@ if __name__ == '__main__':
 
     # models
     bi_directional = False
-    model = CRNetNCP_ZRNN(  # custom version of crnet-zncp (adaptive sensory neurons: 16*16 -> 1024)
-        in_channels=in_channels,
-        ncp_spatial_dim=16,  # RNN features: 16*16=256 < 1024; adaptive enhance number of features
-        ncp_feature_seq=16,  # RNN data sequence: 16
-        adaptive_ncp_sensory=1024,
-        inter_neurons=192,
-        command_neurons=48,
-        motor_neurons=4,
-        sensory_outs=96,
-        inter_outs=32,
-        recurrent_dense=48,
-        motor_ins=48,
-        bi_directional=bi_directional
-    ).cuda()  # ncp: 1024 -> 192 -> 48 -> 4; classification: 16*4 -> 2
+    model = CRNetNCP_ZRNN(in_channels=in_channels, bi_directional=bi_directional).cuda()
     print(model)
     model_summary = torchinfo.summary(
         model=model,
@@ -85,8 +72,8 @@ if __name__ == '__main__':
     print("[INFO] Using " + device + " for training ...")
 
     # path for images
-    covid_dir = "../../datasets/Dataset_Covid/COVID"
-    non_covid_dir = "../../datasets/Dataset_Covid/NONCOVID"
+    covid_dir = "../datasets/Dataset_Covid/COVID"
+    non_covid_dir = "../datasets/Dataset_Covid/NONCOVID"
 
     # path for train, validation, and test sets
     train_covid_file = f"records/covid_{shuffler_version}/covid_train_{shuffler_version}.txt"
