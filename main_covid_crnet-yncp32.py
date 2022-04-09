@@ -182,7 +182,7 @@ if __name__ == '__main__':
     hours, minutes = divmod(minutes, 60)
 
     # record training time
-    with open(model_summary_file, 'w') as f:
+    with open(model_summary_file, 'a+') as f:
         f.write('\n\n')
         f.write(f"Training Time: {hours}h {minutes}m {seconds}s")
 
