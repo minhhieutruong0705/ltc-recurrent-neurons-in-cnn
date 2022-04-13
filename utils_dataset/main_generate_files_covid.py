@@ -3,7 +3,7 @@ import os
 from train_val_test_files_uitls import create_train_val_test_files
 
 if __name__ == "__main__":
-    version = "6"
+    version = "7"
     save_dir = f"../records/covid_{version}"
     os.makedirs(save_dir, exist_ok=True)
 
