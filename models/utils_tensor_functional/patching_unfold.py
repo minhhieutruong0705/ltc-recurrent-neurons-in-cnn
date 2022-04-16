@@ -53,6 +53,7 @@ class Unfolder(nn.Module):
 
 def __load_img_as_tensor__(img_path):
     img = cv2.imread(img_path, -1)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     return transforms.ToTensor()(img)
 
 
