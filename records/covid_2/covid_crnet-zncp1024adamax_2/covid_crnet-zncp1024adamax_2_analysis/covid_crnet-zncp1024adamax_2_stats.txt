@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 96.029167, Standard Deviation: 0.336711, Standard Error: 0.068731
+Max: 96.61, Min: 95.08
+
+[VALID]:F1:
+Mean: 96.053333, Standard Deviation: 0.329022, Standard Error: 0.067161
+Max: 96.65, Min: 95.17
+
+[VALID]:Dice:
+Mean: 92.407083, Standard Deviation: 0.607375, Standard Error: 0.123980
+Max: 93.52, Min: 90.79
+
+Test result on best validated epoch:
+[TEST] Epoch 107: Loss: 0.7909, Acc: 95.38, F1: 95.48, Dice: 91.35, Pre: 0.93, Re: 0.98, TP: 454, TN: 433, FP: 32, FN: 11

@@ -1,0 +1,88 @@
+CRNetNCP_ZRNN(
+  (down_samples): ModuleList(
+    (0): ConvPool(
+      (conv): Conv2d(3, 32, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3), bias=False)
+      (bn): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      (relu): ReLU(inplace=True)
+      (max_pool): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=False)
+    )
+    (1): ConvPool(
+      (conv): Conv2d(32, 64, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+      (relu): ReLU(inplace=True)
+      (max_pool): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=False)
+    )
+    (2): ConvPool(
+      (conv): Conv2d(64, 128, kernel_size=(7, 7), stride=(1, 1), padding=(3, 3))
+      (relu): ReLU(inplace=True)
+      (max_pool): MaxPool2d(kernel_size=3, stride=2, padding=0, dilation=1, ceil_mode=False)
+    )
+  )
+  (bottleneck): BottleneckConvAvePool(
+    (conv): Conv2d(128, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (ave_pooling): AdaptiveAvgPool2d(output_size=27)
+  )
+  (adaptive_shrink): Sequential(
+    (0): Dropout(p=0.5, inplace=False)
+    (1): Linear(in_features=729, out_features=1024, bias=True)
+    (2): ReLU(inplace=True)
+  )
+  (ncp_fc): NCP_FC(
+    sensory_neurons=1024, inter_neurons=192, command_neurons=48, motor_neurons=4,
+    sensory_outs=96, inter_outs=32, recurrent_dense=48, motor_ins=48,
+    seq_len=16, classes=2, bi_directional=False
+    (ltc_fwd_seq): RNNSequence(
+      (rnn_cell): LTCCell(
+        (_clip): ReLU()
+      )
+    )
+    (fc): Sequential(
+      (0): Dropout(p=0.3, inplace=False)
+      (1): Linear(in_features=64, out_features=2, bias=True)
+    )
+  )
+)
+
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+CRNetNCP_ZRNN                            --                        --
+├─ModuleList: 1-1                        --                        --
+│    └─ConvPool: 2-1                     [64, 32, 111, 111]        --
+│    │    └─Conv2d: 3-1                  [64, 32, 224, 224]        4,704
+│    │    └─BatchNorm2d: 3-2             [64, 32, 224, 224]        64
+│    │    └─ReLU: 3-3                    [64, 32, 224, 224]        --
+│    │    └─MaxPool2d: 3-4               [64, 32, 111, 111]        --
+│    └─ConvPool: 2-2                     [64, 64, 55, 55]          --
+│    │    └─Conv2d: 3-5                  [64, 64, 111, 111]        100,416
+│    │    └─ReLU: 3-6                    [64, 64, 111, 111]        --
+│    │    └─MaxPool2d: 3-7               [64, 64, 55, 55]          --
+│    └─ConvPool: 2-3                     [64, 128, 27, 27]         --
+│    │    └─Conv2d: 3-8                  [64, 128, 55, 55]         401,536
+│    │    └─ReLU: 3-9                    [64, 128, 55, 55]         --
+│    │    └─MaxPool2d: 3-10              [64, 128, 27, 27]         --
+├─BottleneckConvAvePool: 1-2             [64, 16, 27, 27]          --
+│    └─Conv2d: 2-4                       [64, 16, 27, 27]          18,448
+│    └─AdaptiveAvgPool2d: 2-5            [64, 16, 27, 27]          --
+├─Sequential: 1-3                        [64, 16, 1024]            --
+│    └─Dropout: 2-6                      [64, 16, 729]             --
+│    └─Linear: 2-7                       [64, 16, 1024]            747,520
+│    └─ReLU: 2-8                         [64, 16, 1024]            --
+├─NCP_FC: 1-4                            [64, 2]                   --
+│    └─RNNSequence: 2-9                  [64, 16, 4]               --
+│    │    └─LTCCell: 3-11                --                        1,240,356
+│    └─Sequential: 2-10                  [64, 2]                   --
+│    │    └─Dropout: 3-12                [64, 64]                  --
+│    │    └─Linear: 3-13                 [64, 2]                   130
+==========================================================================================
+Total params: 1,272,818
+Trainable params: 1,272,818
+Non-trainable params: 0
+Total mult-adds (G): 172.93
+==========================================================================================
+Input size (MB): 38.54
+Forward/backward pass size (MB): 2260.51
+Params size (MB): 5.09
+Estimated Total Size (MB): 2304.14
+==========================================================================================
+
+Training Time: 1h 25m 37s

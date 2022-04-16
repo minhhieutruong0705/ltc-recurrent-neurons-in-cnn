@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 95.090000, Standard Deviation: 0.533096, Standard Error: 0.108818
+Max: 96.05, Min: 93.71
+
+[VALID]:F1:
+Mean: 95.243333, Standard Deviation: 0.477874, Standard Error: 0.097546
+Max: 96.14, Min: 94.08
+
+[VALID]:Dice:
+Mean: 90.921667, Standard Deviation: 0.866418, Standard Error: 0.176857
+Max: 92.56, Min: 88.83
+
+Test result on best validated epoch:
+[TEST] Epoch 171: Loss: 0.7910, Acc: 95.27, F1: 95.40, Dice: 91.20, Pre: 0.93, Re: 0.98, TP: 456, TN: 430, FP: 35, FN: 9

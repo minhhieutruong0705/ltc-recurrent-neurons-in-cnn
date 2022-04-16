@@ -1,0 +1,15 @@
+
+[VALID]:Acc:
+Mean: 95.765833, Standard Deviation: 0.502750, Standard Error: 0.102623
+Max: 96.53, Min: 94.68
+
+[VALID]:F1:
+Mean: 95.795000, Standard Deviation: 0.549143, Standard Error: 0.112093
+Max: 96.58, Min: 94.59
+
+[VALID]:Dice:
+Mean: 91.932917, Standard Deviation: 1.007226, Standard Error: 0.205599
+Max: 93.38, Min: 89.74
+
+Test result on best validated epoch:
+[TEST] Epoch 142: Loss: 0.7900, Acc: 95.70, F1: 95.84, Dice: 92.02, Pre: 0.93, Re: 0.99, TP: 461, TN: 429, FP: 36, FN: 4
