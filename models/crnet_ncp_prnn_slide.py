@@ -70,7 +70,7 @@ class CRNetNCP_SlidePRNN(CRNet):
         )
 
         # calculate number of patches
-        n_patches = ((ncp_spatial_dim - ncp_window_size + 1) // ncp_window_stride) ** 2
+        n_patches = ((ncp_spatial_dim - ncp_window_size) // ncp_window_stride + 1) ** 2
 
         # ncp classifier with data sequence on patches
         patch_features = ncp_window_size ** 2 * ncp_features_shrink
